@@ -1,0 +1,109 @@
+[data-scroll] {
+  transition: all 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(20px);
+}
+
+[data-scroll].is-revealed {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.parallax-section {
+  transform: translateY(var(--scroll-progress, 0));
+  will-change: transform;
+}
+
+.scroll-indicator {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.scroll-indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(160, 174, 192, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.scroll-indicator-dot:hover {
+  background-color: rgba(160, 174, 192, 0.8);
+}
+
+.scroll-indicator-dot.active {
+  background-color: #4299e1;
+  transform: scale(1.2);
+}
+
+/* Dark mode styles */
+[data-theme="dark"] .scroll-indicator-dot {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .scroll-indicator-dot:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .scroll-indicator-dot.active {
+  background-color: #63b3ed;
+}
+
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, #3182ce, #805ad5);
+  transform-origin: 0%;
+  z-index: 1000;
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-bg {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}

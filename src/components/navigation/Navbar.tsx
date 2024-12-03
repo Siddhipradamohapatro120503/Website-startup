@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -43,6 +44,7 @@ export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
   const { scrollToSection } = useSmoothScroll();
+  const navigate = useNavigate();
   
   const bgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.600', 'white');
@@ -51,6 +53,10 @@ export default function Navbar() {
   const handleNavClick = (href: string) => {
     const sectionId = href.replace('#', '');
     scrollToSection(sectionId);
+  };
+
+  const handleGetStarted = () => {
+    navigate('/login');
   };
 
   return (
@@ -122,13 +128,12 @@ export default function Navbar() {
               variant="ghost"
             />
             <Button
-              as="a"
               display={{ base: 'none', md: 'inline-flex' }}
               fontSize="sm"
               fontWeight={600}
               color="white"
               bg="blue.400"
-              onClick={() => handleNavClick('#contact')}
+              onClick={handleGetStarted}
               _hover={{
                 bg: 'blue.300',
               }}
@@ -155,6 +160,17 @@ export default function Navbar() {
                 {navItem.label}
               </Button>
             ))}
+            <Button
+              w="full"
+              color="white"
+              bg="blue.400"
+              onClick={handleGetStarted}
+              _hover={{
+                bg: 'blue.300',
+              }}
+            >
+              Get Started
+            </Button>
           </Stack>
         </Collapse>
       </Container>

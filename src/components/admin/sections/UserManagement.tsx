@@ -1,5 +1,6 @@
 // @ts-nocheck
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import api from '../../../api/axios';
 import {
   Box,
   VStack,
@@ -25,151 +26,145 @@ import {
   Th,
   Td,
   TableContainer,
+  useToast,
 } from '@chakra-ui/react';
 import {
   FiMoreVertical,
   FiEdit2,
-  FiTrash2,
-  FiMail,
   FiSearch,
   FiFilter,
-  FiUserCheck,
-  FiUserX,
-  FiAlertCircle,
-  FiKey,
 } from 'react-icons/fi';
 
 interface User {
-  id: string;
-  name: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: string;
-  status: 'active' | 'inactive' | 'pending';
+  isActive: boolean;
+  lastLogin?: Date;
 }
 
-const mockUsers: User[] = Array.from({ length: 100 }, (_, i) => ({
-  id: `user-${i + 1}`,
-  name: `User ${i + 1}`,
-  email: `user${i + 1}@example.com`,
-  role: i % 3 === 0 ? 'Admin' : i % 2 === 0 ? 'Manager' : 'User',
-  status: i % 3 === 0 ? 'active' : i % 2 === 0 ? 'inactive' : 'pending',
-}));
+const UserManagement = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState('all');
+  const toast = useToast();
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'active':
-      return 'green';
-    case 'inactive':
-      return 'red';
-    case 'pending':
-      return 'yellow';
-    default:
-      return 'gray';
-  }
-};
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-const UserManagement: React.FC = () => {
-  const [users] = useState<User[]>(mockUsers);
-  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-
-  const handleUserSelect = (userId: string) => {
-    const newSelected = new Set(selectedUsers);
-    if (selectedUsers.has(userId)) {
-      newSelected.delete(userId);
-    } else {
-      newSelected.add(userId);
-    }
-    setSelectedUsers(newSelected);
-  };
-
-  const handleSelectAll = () => {
-    if (selectedUsers.size === users.length) {
-      setSelectedUsers(new Set());
-    } else {
-      setSelectedUsers(new Set(users.map(user => user.id)));
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get('/users');
+      setUsers(response.data);
+    } catch (error) {
+      toast({
+        title: 'Error fetching users',
+        description: error.response?.data?.message || 'Something went wrong',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const updateUserStatus = async (userId: string, isActive: boolean) => {
+    try {
+      await api.patch(`/users/${userId}/status`, { isActive });
+      fetchUsers();
+      toast({
+        title: 'User status updated',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error updating user status',
+        description: error.response?.data?.message || 'Something went wrong',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = 
+        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesRole = selectedRole === 'all' || user.role === selectedRole;
+      
+      return matchesSearch && matchesRole;
+    });
+  }, [users, searchTerm, selectedRole]);
 
   return (
-    <Box>
-      {/* Filters and Actions */}
-      <HStack spacing={4} mb={6}>
-        <InputGroup maxW="xs">
-          <InputLeftElement pointerEvents="none">
-            <FiSearch color="gray.300" />
-          </InputLeftElement>
-          <Input placeholder="Search users..." />
-        </InputGroup>
-        <Select placeholder="Filter by role" maxW="xs">
-          <option value="all">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="manager">Manager</option>
-          <option value="user">User</option>
-        </Select>
-        <Select placeholder="Filter by status" maxW="xs">
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="pending">Pending</option>
-        </Select>
-        <Button leftIcon={<FiFilter />} colorScheme="blue">
-          Apply Filters
-        </Button>
-      </HStack>
+    <Box p={4}>
+      <VStack spacing={4} align="stretch">
+        <HStack justify="space-between">
+          <Text fontSize="2xl" fontWeight="bold">User Management</Text>
+        </HStack>
 
-      {/* Users Table */}
-      <Box
-        bg={bgColor}
-        borderRadius="lg"
-        borderWidth="1px"
-        borderColor={borderColor}
-        overflow="hidden"
-      >
+        <HStack spacing={4}>
+          <InputGroup maxW="300px">
+            <InputLeftElement pointerEvents="none">
+              <FiSearch />
+            </InputLeftElement>
+            <Input
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </InputGroup>
+          
+          <Select
+            maxW="200px"
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+          >
+            <option value="all">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </Select>
+        </HStack>
+
         <TableContainer>
           <Table variant="simple">
             <Thead>
               <Tr>
-                <Th px={4} py={4}>
-                  <Checkbox
-                    isChecked={selectedUsers.size === users.length}
-                    isIndeterminate={selectedUsers.size > 0 && selectedUsers.size < users.length}
-                    onChange={handleSelectAll}
-                  />
-                </Th>
-                <Th>User</Th>
+                <Th>Name</Th>
                 <Th>Email</Th>
                 <Th>Role</Th>
                 <Th>Status</Th>
+                <Th>Last Login</Th>
                 <Th>Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {users.map(user => (
-                <Tr key={user.id}>
-                  <Td px={4}>
-                    <Checkbox
-                      isChecked={selectedUsers.has(user.id)}
-                      onChange={() => handleUserSelect(user.id)}
-                    />
-                  </Td>
-                  <Td>
-                    <Text fontWeight="medium">{user.name}</Text>
-                  </Td>
+              {filteredUsers.map((user) => (
+                <Tr key={user._id}>
+                  <Td>{`${user.firstName} ${user.lastName}`}</Td>
                   <Td>{user.email}</Td>
-                  <Td>{user.role}</Td>
                   <Td>
-                    <Badge
-                      colorScheme={getStatusColor(user.status)}
-                      variant="subtle"
-                      px={2}
-                      py={1}
-                      borderRadius="full"
-                    >
-                      {user.status}
+                    <Badge colorScheme={user.role === 'admin' ? 'purple' : 'blue'}>
+                      {user.role}
                     </Badge>
                   </Td>
+                  <Td>
+                    <Badge colorScheme={user.isActive ? 'green' : 'red'}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </Td>
+                  <Td>{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</Td>
                   <Td>
                     <Menu>
                       <MenuButton
@@ -179,12 +174,8 @@ const UserManagement: React.FC = () => {
                         size="sm"
                       />
                       <MenuList>
-                        <MenuItem icon={<FiEdit2 />}>Edit User</MenuItem>
-                        <MenuItem icon={<FiKey />}>Change Role</MenuItem>
-                        <MenuItem icon={<FiMail />}>Send Email</MenuItem>
-                        <MenuItem icon={<FiAlertCircle />}>Flag Account</MenuItem>
-                        <MenuItem icon={<FiTrash2 />} color="red.500">
-                          Delete User
+                        <MenuItem onClick={() => updateUserStatus(user._id, !user.isActive)}>
+                          {user.isActive ? 'Deactivate' : 'Activate'} User
                         </MenuItem>
                       </MenuList>
                     </Menu>
@@ -194,7 +185,7 @@ const UserManagement: React.FC = () => {
             </Tbody>
           </Table>
         </TableContainer>
-      </Box>
+      </VStack>
     </Box>
   );
 };

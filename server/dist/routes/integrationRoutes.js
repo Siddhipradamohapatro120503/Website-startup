@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const integrationController_1 = require("../controllers/integrationController");
+const router = (0, express_1.Router)();
+router.get('/', integrationController_1.getIntegrations);
+router.get('/:id', integrationController_1.getIntegration);
+router.post('/', integrationController_1.createIntegration);
+router.put('/:id', integrationController_1.updateIntegration);
+router.delete('/:id', integrationController_1.deleteIntegration);
+router.post('/:id/toggle', integrationController_1.toggleIntegration);
+exports.default = router;

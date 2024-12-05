@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -42,6 +42,9 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  Heading,
+  useToast, // Replace 'toast' with 'useToast'
+  Textarea
 } from '@chakra-ui/react';
 import {
   FiPlus,
@@ -54,10 +57,12 @@ import {
   FiDollarSign,
   FiBarChart,
   FiCalendar,
+  FiDatabase
 } from 'react-icons/fi';
 
+import { seedServicesFromLanding } from '../../../scripts/seedServices';
+
 interface SubCategory {
-  id: string;
   name: string;
 }
 
@@ -68,151 +73,127 @@ interface Schedule {
 }
 
 interface ServiceMetrics {
-  views: number;
-  bookings: number;
-  revenue: number;
-  rating: number;
+  views?: number;
+  bookings?: number;
+  rating?: number;
 }
 
 interface Service {
-  id: string;
+  _id?: string;
+  id?: string;
   name: string;
   category: string;
-  subCategories: SubCategory[];
-  pricing: {
-    base: number;
-    premium: number;
-    enterprise: number;
+  status?: 'active' | 'inactive' | 'draft';
+  pricing?: {
+    base?: number;
+    premium?: number;
+    enterprise?: number;
   };
-  availability: {
+  metrics?: ServiceMetrics;
+  subCategories?: SubCategory[];
+  availability?: {
     regions: string[];
     schedule: Schedule[];
   };
-  metrics: ServiceMetrics;
-  status: 'active' | 'inactive' | 'draft';
+  description?: string;
 }
 
 // Mock data
-const mockServices: Service[] = Array.from({ length: 10 }, (_, i) => ({
-  id: `service-${i + 1}`,
-  name: `Service ${i + 1}`,
-  category: ['Technology', 'Design', 'Marketing', 'Business'][i % 4],
-  subCategories: [
-    { id: '1', name: 'Web Development' },
-    { id: '2', name: 'Mobile Development' },
-  ],
-  pricing: {
-    base: 99 + i * 50,
-    premium: 199 + i * 100,
-    enterprise: 499 + i * 200,
-  },
-  availability: {
-    regions: ['North America', 'Europe', 'Asia'],
-    schedule: [
-      { dayOfWeek: 1, startTime: '09:00', endTime: '17:00' },
-      { dayOfWeek: 2, startTime: '09:00', endTime: '17:00' },
-    ],
-  },
-  metrics: {
-    views: 1000 + i * 100,
-    bookings: 50 + i * 5,
-    revenue: 5000 + i * 500,
-    rating: 4 + (i % 2) * 0.5,
-  },
-  status: i % 3 === 0 ? 'active' : i % 2 === 0 ? 'inactive' : 'draft',
-}));
+const mockServices: Service[] = [];
 
 const ServiceManagement: React.FC = () => {
-  const [services] = useState<Service[]>(mockServices);
+  const [services, setServices] = useState<Service[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const toast = useToast(); // Initialize the useToast hook
 
-  const getStatusColor = (status: Service['status']) => {
-    const colors = {
-      active: 'green',
-      inactive: 'red',
-      draft: 'yellow',
-    };
-    return colors[status];
+  const fetchServices = async () => {
+    try {
+      setIsLoading(true);
+      const params = new URLSearchParams();
+      
+      if (searchTerm) {
+        params.append('search', searchTerm);
+      }
+      if (filterCategory !== 'all') {
+        params.append('category', filterCategory);
+      }
+
+      console.log('Fetching services with params:', params.toString());
+
+      const response = await fetch(`http://localhost:5000/api/services?${params.toString()}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
+        throw new Error(errorData || 'Failed to fetch services');
+      }
+      
+      const data = await response.json();
+      console.log('Received services:', data);
+      
+      setServices(data);
+    } catch (err) {
+      console.error('Error fetching services:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching services');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return (
-    <Box>
-      {/* Stats Overview */}
-      <Grid templateColumns="repeat(4, 1fr)" gap={6} mb={6}>
-        <Stat bg={bgColor} p={4} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-          <StatLabel>Total Services</StatLabel>
-          <StatNumber>{services.length}</StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
-            23.36%
-          </StatHelpText>
-        </Stat>
-        <Stat bg={bgColor} p={4} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-          <StatLabel>Active Services</StatLabel>
-          <StatNumber>
-            {services.filter(s => s.status === 'active').length}
-          </StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
-            12.5%
-          </StatHelpText>
-        </Stat>
-        <Stat bg={bgColor} p={4} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-          <StatLabel>Total Revenue</StatLabel>
-          <StatNumber>
-            ${services.reduce((acc, s) => acc + s.metrics.revenue, 0).toLocaleString()}
-          </StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
-            28.14%
-          </StatHelpText>
-        </Stat>
-        <Stat bg={bgColor} p={4} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-          <StatLabel>Avg. Rating</StatLabel>
-          <StatNumber>
-            {(services.reduce((acc, s) => acc + s.metrics.rating, 0) / services.length).toFixed(1)}
-          </StatNumber>
-          <StatHelpText>
-            <StatArrow type="increase" />
-            9.05%
-          </StatHelpText>
-        </Stat>
-      </Grid>
+  // Debounce search to avoid too many API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchServices();
+    }, 300);
 
-      {/* Filters and Actions */}
-      <HStack spacing={4} mb={6}>
-        <InputGroup maxW="xs">
-          <InputLeftElement pointerEvents="none">
-            <FiSearch color="gray.300" />
-          </InputLeftElement>
-          <Input placeholder="Search services..." />
-        </InputGroup>
-        <Select placeholder="Category" maxW="xs">
-          <option value="technology">Technology</option>
-          <option value="design">Design</option>
-          <option value="marketing">Marketing</option>
-          <option value="business">Business</option>
-        </Select>
-        <Select placeholder="Status" maxW="xs">
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="draft">Draft</option>
-        </Select>
-        <Button leftIcon={<FiFilter />} colorScheme="blue">
-          Apply Filters
-        </Button>
-        <Button leftIcon={<FiPlus />} colorScheme="green" onClick={onOpen}>
-          Add Service
-        </Button>
-      </HStack>
+    return () => clearTimeout(timer);
+  }, [searchTerm, filterCategory]);
 
-      {/* Services Grid */}
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const renderServices = () => {
+    if (isLoading) {
+      return (
+        <Box textAlign="center" py={8}>
+          <Text>Loading services...</Text>
+        </Box>
+      );
+    }
+
+    if (error) {
+      return (
+        <Box textAlign="center" py={8} color="red.500">
+          <Text>{error}</Text>
+        </Box>
+      );
+    }
+
+    if (!services || services.length === 0) {
+      return (
+        <Box textAlign="center" py={8}>
+          <Text>No services found</Text>
+        </Box>
+      );
+    }
+
+    return (
       <Grid templateColumns="repeat(3, 1fr)" gap={6}>
         {services.map(service => (
           <Box
-            key={service.id}
+            key={service.id || service._id}
             bg={bgColor}
             p={6}
             borderRadius="lg"
@@ -226,7 +207,7 @@ const ServiceManagement: React.FC = () => {
                 py={1}
                 borderRadius="full"
               >
-                {service.status}
+                {service.status || 'draft'}
               </Badge>
               <Menu>
                 <MenuButton
@@ -240,7 +221,11 @@ const ServiceManagement: React.FC = () => {
                   <MenuItem icon={<FiGlobe />}>Manage Regions</MenuItem>
                   <MenuItem icon={<FiCalendar />}>Update Schedule</MenuItem>
                   <MenuItem icon={<FiBarChart />}>View Analytics</MenuItem>
-                  <MenuItem icon={<FiTrash2 />} color="red.500">
+                  <MenuItem 
+                    icon={<FiTrash2 />} 
+                    color="red.500" 
+                    onClick={() => handleDeleteService(service.id || service._id)}
+                  >
                     Delete Service
                   </MenuItem>
                 </MenuList>
@@ -254,149 +239,432 @@ const ServiceManagement: React.FC = () => {
               {service.category}
             </Text>
 
-            <Grid templateColumns="repeat(2, 1fr)" gap={4} mb={4}>
+            <Grid templateColumns="repeat(3, 1fr)" gap={4} mb={4}>
               <VStack align="start">
                 <Text fontSize="sm" color="gray.500">
                   Base Price
                 </Text>
-                <Text fontWeight="bold">${service.pricing.base}</Text>
+                <Text fontWeight="bold">
+                  {service.pricing?.base ? `$${service.pricing.base}` : 'N/A'}
+                </Text>
               </VStack>
               <VStack align="start">
                 <Text fontSize="sm" color="gray.500">
                   Premium Price
                 </Text>
-                <Text fontWeight="bold">${service.pricing.premium}</Text>
+                <Text fontWeight="bold">
+                  {service.pricing?.premium ? `$${service.pricing.premium}` : 'N/A'}
+                </Text>
+              </VStack>
+              <VStack align="start">
+                <Text fontSize="sm" color="gray.500">
+                  Enterprise Price
+                </Text>
+                <Text fontWeight="bold">
+                  {service.pricing?.enterprise ? `$${service.pricing.enterprise}` : 'N/A'}
+                </Text>
               </VStack>
             </Grid>
 
-            <Grid templateColumns="repeat(3, 1fr)" gap={2}>
+            <Grid templateColumns="repeat(3, 1fr)" gap={4}>
               <VStack align="start">
                 <Text fontSize="sm" color="gray.500">
                   Views
                 </Text>
-                <Text fontWeight="bold">{service.metrics.views}</Text>
+                <Text fontWeight="bold">{service.metrics?.views || 0}</Text>
               </VStack>
               <VStack align="start">
                 <Text fontSize="sm" color="gray.500">
                   Bookings
                 </Text>
-                <Text fontWeight="bold">{service.metrics.bookings}</Text>
+                <Text fontWeight="bold">{service.metrics?.bookings || 0}</Text>
               </VStack>
               <VStack align="start">
                 <Text fontSize="sm" color="gray.500">
                   Rating
                 </Text>
-                <Text fontWeight="bold">{service.metrics.rating}/5</Text>
+                <Text fontWeight="bold">{service.metrics?.rating || 0}/5</Text>
               </VStack>
             </Grid>
           </Box>
         ))}
       </Grid>
+    );
+  };
+
+  const getStatusColor = (status?: string): string => {
+    const colors: Record<string, string> = {
+      active: 'green',
+      inactive: 'red',
+      draft: 'yellow',
+    };
+    return status ? colors[status] || 'gray' : 'gray';
+  };
+
+  const handleCreateService = async (serviceData: Partial<Service>) => {
+    try {
+      // Get the token from localStorage explicitly
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+
+      console.log('Creating service with data:', serviceData);
+      
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/services`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Add the token to the headers
+        },
+        body: JSON.stringify({
+          name: serviceData.name,
+          category: serviceData.category,
+          description: serviceData.description, // Added description field
+          status: serviceData.status || 'draft',
+          pricing: {
+            base: serviceData.pricing?.base || 0,
+            premium: serviceData.pricing?.premium || 0,
+            enterprise: serviceData.pricing?.enterprise || 0,
+          },
+          metrics: {
+            views: 0,
+            bookings: 0,
+            rating: 0,
+          },
+          subCategories: serviceData.subCategories || [],
+          availability: serviceData.availability || {
+            regions: [],
+            schedule: [],
+          },
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
+        throw new Error(errorData || 'Failed to create service');
+      }
+      
+      const createdService = await response.json();
+      console.log('Created service:', createdService);
+      
+      // Update services list
+      await fetchServices();
+      
+      // Close modal
+      onClose();
+    } catch (error) {
+      console.error('Error creating service:', error);
+      // Show error toast using the useToast hook
+      toast({
+        title: 'Error Creating Service',
+        description: error instanceof Error ? error.message : 'Failed to create service',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
+  };
+
+  const handleDeleteService = async (serviceId?: string) => {
+    if (!serviceId) {
+      console.error('Cannot delete service: No ID provided');
+      return;
+    }
+
+    try {
+      // Get the token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/services/${serviceId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || 'Failed to delete service');
+      }
+
+      // Refresh services after deletion
+      await fetchServices();
+      
+      // Show success toast
+      toast({
+        title: 'Service Deleted',
+        description: 'The service has been successfully deleted.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    } catch (error) {
+      console.error('Error deleting service:', error);
+      // Show error toast
+      toast({
+        title: 'Error Deleting Service',
+        description: error instanceof Error ? error.message : 'Failed to delete service',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
+  };
+
+  const handleEditService = async (service: Service) => {
+    // TODO: Implement edit service functionality
+    console.log('Edit service:', service);
+  };
+
+  // Add Service Modal
+  const [formData, setFormData] = useState({
+    name: '',
+    category: '',
+    description: '', // Added description field
+    pricing: {
+      base: 0,
+      premium: 0,
+      enterprise: 0
+    },
+    status: 'draft' as const
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleCreateService(formData);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePricingChange = (field: keyof typeof formData.pricing, value: number) => {
+    setFormData(prev => ({
+      ...prev,
+      pricing: {
+        ...prev.pricing,
+        [field]: value
+      }
+    }));
+  };
+
+  return (
+    <Box p={8}>
+      <VStack spacing={8} align="stretch">
+        {/* Header */}
+        <HStack justify="space-between">
+          <Heading size="lg">Service Management</Heading>
+          <HStack spacing={4}>
+            <Button
+              leftIcon={<FiDatabase />}
+              colorScheme="purple"
+              onClick={async () => {
+                try {
+                  const result = await seedServicesFromLanding();
+                  if (result.success) {
+                    await fetchServices(); // Refresh the services list
+                  }
+                  
+                  // Show toast with detailed message
+                  toast({
+                    title: result.success ? 'Services Import Complete' : 'Import Error',
+                    description: (
+                      <VStack align="start" spacing={1}>
+                        <Text>{result.message}</Text>
+                        {result.details.failed.length > 0 && (
+                          <Text color="red.500" fontSize="sm">
+                            Failed services: {result.details.failed.join(', ')}
+                          </Text>
+                        )}
+                      </VStack>
+                    ),
+                    status: result.success ? 'success' : 'error',
+                    duration: 7000,
+                    isClosable: true,
+                    position: 'top-right'
+                  });
+                } catch (error) {
+                  toast({
+                    title: 'Error',
+                    description: 'Failed to import services',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                    position: 'top-right'
+                  });
+                }
+              }}
+            >
+              Import Landing Services
+            </Button>
+            <Button
+              leftIcon={<FiPlus />}
+              colorScheme="blue"
+              onClick={onOpen}
+            >
+              Add Service
+            </Button>
+          </HStack>
+        </HStack>
+
+        {/* Search and Filter */}
+        <HStack spacing={4}>
+          <InputGroup maxW="md">
+            <InputLeftElement pointerEvents="none">
+              <FiSearch color="gray.300" />
+            </InputLeftElement>
+            <Input 
+              placeholder="Search services..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </InputGroup>
+
+          <Select
+            placeholder="Category"
+            maxW="xs"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            <option value="all">All Categories</option>
+            <option value="technology">Technology</option>
+            <option value="design">Design</option>
+            <option value="marketing">Marketing</option>
+            <option value="business">Business</option>
+          </Select>
+        </HStack>
+
+        {/* Services Grid */}
+        {renderServices()}
+      </VStack>
 
       {/* Add Service Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Service</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Tabs>
-              <TabList>
-                <Tab>Basic Info</Tab>
-                <Tab>Pricing</Tab>
-                <Tab>Availability</Tab>
-              </TabList>
+          <form onSubmit={handleSubmit}>
+            <ModalHeader>Add New Service</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <VStack spacing={4}>
+                <FormControl isRequired>
+                  <FormLabel>Service Name</FormLabel>
+                  <Input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="Enter service name"
+                  />
+                </FormControl>
 
-              <TabPanels>
-                <TabPanel>
-                  <VStack spacing={4}>
-                    <FormControl>
-                      <FormLabel>Service Name</FormLabel>
-                      <Input placeholder="Enter service name" />
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel>Category</FormLabel>
-                      <Select placeholder="Select category">
-                        <option value="technology">Technology</option>
-                        <option value="design">Design</option>
-                        <option value="marketing">Marketing</option>
-                        <option value="business">Business</option>
-                      </Select>
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel>Status</FormLabel>
-                      <Select placeholder="Select status">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="draft">Draft</option>
-                      </Select>
-                    </FormControl>
-                  </VStack>
-                </TabPanel>
+                <FormControl isRequired>
+                  <FormLabel>Description</FormLabel>
+                  <Textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange(e as any)}
+                    placeholder="Enter service description"
+                  />
+                </FormControl>
 
-                <TabPanel>
-                  <VStack spacing={4}>
-                    <FormControl>
-                      <FormLabel>Base Price ($)</FormLabel>
-                      <NumberInput min={0}>
-                        <NumberInputField />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel>Premium Price ($)</FormLabel>
-                      <NumberInput min={0}>
-                        <NumberInputField />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel>Enterprise Price ($)</FormLabel>
-                      <NumberInput min={0}>
-                        <NumberInputField />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                    </FormControl>
-                  </VStack>
-                </TabPanel>
+                <FormControl isRequired>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    placeholder="Select category"
+                  >
+                    <option value="technology">Technology</option>
+                    <option value="design">Design</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="business">Business</option>
+                  </Select>
+                </FormControl>
 
-                <TabPanel>
-                  <VStack spacing={4}>
-                    <FormControl>
-                      <FormLabel>Available Regions</FormLabel>
-                      <Select placeholder="Select regions" multiple>
-                        <option value="na">North America</option>
-                        <option value="eu">Europe</option>
-                        <option value="asia">Asia</option>
-                        <option value="sa">South America</option>
-                      </Select>
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel>Schedule</FormLabel>
-                      {/* Add schedule configuration here */}
-                      <Text color="gray.500">Schedule configuration coming soon</Text>
-                    </FormControl>
-                  </VStack>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </ModalBody>
+                <FormControl isRequired>
+                  <FormLabel>Base Price ($)</FormLabel>
+                  <NumberInput
+                    min={0}
+                    value={formData.pricing.base}
+                    onChange={(_, value) => handlePricingChange('base', value)}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </FormControl>
 
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue">Save Service</Button>
-          </ModalFooter>
+                <FormControl isRequired>
+                  <FormLabel>Premium Price ($)</FormLabel>
+                  <NumberInput
+                    min={0}
+                    value={formData.pricing.premium}
+                    onChange={(_, value) => handlePricingChange('premium', value)}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel>Enterprise Price ($)</FormLabel>
+                  <NumberInput
+                    min={0}
+                    value={formData.pricing.enterprise}
+                    onChange={(_, value) => handlePricingChange('enterprise', value)}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                  >
+                    <option value="draft">Draft</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </Select>
+                </FormControl>
+              </VStack>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button variant="ghost" mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" colorScheme="blue">
+                Create Service
+              </Button>
+            </ModalFooter>
+          </form>
         </ModalContent>
       </Modal>
     </Box>

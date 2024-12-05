@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { IconType } from 'react-icons';
+import Marquee from 'react-fast-marquee';
 import {
   Box,
   Container,
@@ -31,6 +32,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
+  Avatar,
+  VStack,
 } from '@chakra-ui/react';
 import {
   FiArrowRight,
@@ -439,6 +442,86 @@ export const serviceCategories: ServiceCategory[] = [
   },
 ];
 
+// Testimonials data
+const testimonials = [
+  {
+    name: "Sarah Johnson",
+    role: "Marketing Director",
+    company: "TechCorp Inc.",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
+    content: "The AI services provided by this platform have transformed our marketing strategy. We've seen a 300% increase in engagement!"
+  },
+  {
+    name: "Michael Chen",
+    role: "CTO",
+    company: "InnovateLabs",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
+    content: "Their cloud solutions are robust and scalable. Integration was seamless, and the support team is incredibly responsive."
+  },
+  {
+    name: "Emily Rodriguez",
+    role: "Product Manager",
+    company: "DesignWorks",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
+    content: "The UI/UX services exceeded our expectations. Our user satisfaction scores have improved significantly."
+  },
+  {
+    name: "David Kim",
+    role: "Founder",
+    company: "StartupX",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
+    content: "The digital marketing services helped us achieve our growth targets within just three months. Incredible results!"
+  },
+  {
+    name: "Lisa Thompson",
+    role: "Data Scientist",
+    company: "DataFlow Analytics",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
+    content: "The machine learning models developed by their team have revolutionized our data analysis capabilities."
+  },
+];
+
+const TestimonialCard: React.FC<{
+  name: string;
+  role: string;
+  company: string;
+  avatar: string;
+  content: string;
+}> = ({ name, role, company, avatar, content }) => {
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
+
+  return (
+    <Box
+      mx={4}
+      p={6}
+      maxW="sm"
+      borderWidth="1px"
+      borderRadius="lg"
+      bg={cardBg}
+      boxShadow="lg"
+      minW="350px"
+    >
+      <VStack spacing={4} align="start">
+        <Text fontSize="md" color={textColor} fontStyle="italic">
+          "{content}"
+        </Text>
+        <Flex align="center" mt={4}>
+          <Avatar size="md" src={avatar} name={name} />
+          <Box ml={3}>
+            <Text fontWeight="bold" fontSize="sm">
+              {name}
+            </Text>
+            <Text fontSize="sm" color={textColor}>
+              {role} at {company}
+            </Text>
+          </Box>
+        </Flex>
+      </VStack>
+    </Box>
+  );
+};
+
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('hero');
@@ -458,6 +541,7 @@ const LandingPage: React.FC = () => {
       { id: 'hero', label: 'Home' },
       { id: 'services', label: 'Services' },
       { id: 'features', label: 'Features' },
+      { id: 'testimonials', label: 'Testimonials' },
       { id: 'contactus', label: 'Contact Us' },
     ],
     []
@@ -781,6 +865,45 @@ const LandingPage: React.FC = () => {
             >
               View All Features
             </Button>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Testimonials Section */}
+      <Box py={20} bg={useColorModeValue('gray.50', 'gray.900')}>
+        <Container maxW="container.xl">
+          <VStack spacing={8} mb={12}>
+            <Heading
+              as="h2"
+              size="xl"
+              textAlign="center"
+              mb={2}
+            >
+              What Our Clients Say
+            </Heading>
+            <Text
+              fontSize="lg"
+              color={useColorModeValue('gray.600', 'gray.400')}
+              textAlign="center"
+              maxW="2xl"
+            >
+              Discover how our services have transformed businesses and delighted our clients
+            </Text>
+          </VStack>
+          
+          <Box overflow="hidden" py={8}>
+            <Marquee
+              gradient={false}
+              speed={40}
+              pauseOnHover={true}
+            >
+              {testimonials.map((testimonial, index) => (
+                <TestimonialCard
+                  key={index}
+                  {...testimonial}
+                />
+              ))}
+            </Marquee>
           </Box>
         </Container>
       </Box>

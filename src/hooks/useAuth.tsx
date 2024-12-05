@@ -17,6 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<'admin' | 'user'>;
   register: (userData: any) => Promise<'admin' | 'user'>;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,13 +26,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      getCurrentUser();
-    }
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          await getCurrentUser();
+        } catch (error) {
+          console.error('Error initializing auth:', error);
+          localStorage.removeItem('token');
+          delete api.defaults.headers.common['Authorization'];
+        }
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const getCurrentUser = async () => {
@@ -41,12 +54,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(userData);
       setIsAuthenticated(true);
       setIsAdmin(userData.role === 'admin');
+      return userData;
     } catch (error) {
+      console.error('Error getting current user:', error);
       localStorage.removeItem('token');
       delete api.defaults.headers.common['Authorization'];
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);
+      throw error;
     }
   };
 
@@ -94,14 +110,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAdmin(false);
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Or your loading component
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, register, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isAuthenticated, 
+        isAdmin, 
+        login, 
+        register, 
+        logout,
+        loading
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

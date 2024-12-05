@@ -4,12 +4,13 @@ import {
   registerService,
   updateServiceStatus,
 } from '../controllers/registeredServiceController';
+import { auth } from '../middleware/auth';
 
 const router = Router();
 
-// Public routes for registered services
-router.get('/', getRegisteredServices);
-router.post('/', registerService);
-router.patch('/:id', updateServiceStatus);
+// Protected routes - require authentication
+router.get('/', auth, getRegisteredServices);
+router.post('/', auth, registerService);
+router.patch('/:id', auth, updateServiceStatus);
 
 export default router;

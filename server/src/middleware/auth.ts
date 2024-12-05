@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { CustomRequest } from '../types';
 
-export const auth = (req: Request, res: Response, next: NextFunction) => {
+export const auth = (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -9,9 +10,17 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
       return res.status(401).json({ message: 'No auth token found' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here');
-    // @ts-ignore
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here') as {
+      id: string;
+      email: string;
+      role: string;
+    };
+
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role
+    };
     
     next();
   } catch (error) {

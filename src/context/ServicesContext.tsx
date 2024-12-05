@@ -26,7 +26,12 @@ interface RegisteredService extends Omit<Service, 'icon'> {
   id: string;
   status: 'pending' | 'active' | 'completed';
   registrationDate: string;
-  formData: FormData;
+  formData?: {
+    preferredDate?: string;
+    preferredTime?: string;
+    specialRequirements?: string;
+    paymentMethod?: string;
+  };
   iconName: string;
 }
 
@@ -51,7 +56,19 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/registered-services`);
+      // Get the token from local storage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/registered-services`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
       setRegisteredServices(response.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch registered services');
@@ -69,6 +86,13 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLoading(true);
     setError(null);
     try {
+      // Get the token from local storage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
       const serviceData = {
         service: {
           ...service,
@@ -79,7 +103,13 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         },
         formData
       };
-      const response = await axios.post(`${API_BASE_URL}/registered-services`, serviceData);
+
+      const response = await axios.post(`${API_BASE_URL}/registered-services`, serviceData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
       setRegisteredServices(prev => [...prev, response.data]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to register service');
@@ -94,7 +124,19 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLoading(true);
     setError(null);
     try {
-      await axios.patch(`${API_BASE_URL}/registered-services/${serviceId}`, { status });
+      // Get the token from local storage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      await axios.patch(`${API_BASE_URL}/registered-services/${serviceId}`, { status }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
       setRegisteredServices(prev =>
         prev.map(service =>
           service.id === serviceId ? { ...service, status } : service

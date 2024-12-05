@@ -12,6 +12,7 @@ export interface IRegisteredService extends Document {
   iconName: string;
   status: 'pending' | 'active' | 'completed';
   registrationDate: Date;
+  userEmail: string;  
   formData: {
     preferredDate: string;
     preferredTime: string;
@@ -44,6 +45,10 @@ const registeredServiceSchema = new Schema<IRegisteredService>({
   registrationDate: {
     type: Date,
     default: Date.now
+  },
+  userEmail: {  
+    type: String,
+    required: true
   },
   formData: {
     preferredDate: String,

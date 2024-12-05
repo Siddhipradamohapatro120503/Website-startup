@@ -15,6 +15,7 @@ import Analytics from './components/admin/sections/Analytics';
 import Settings from './components/admin/sections/Settings';
 import Reports from './components/admin/sections/Reports';
 import Integrations from './components/admin/sections/Integrations';
+import RegisteredServices from './components/admin/sections/RegisteredServices';
 import ServiceDetails from './components/ServiceDetails';
 import ServiceDetailPage from './components/ServiceDetailPage';
 import Features from './components/Features';
@@ -62,6 +63,7 @@ function App() {
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="users" element={<UserManagement />} />
                 <Route path="services" element={<ServiceManagement />} />
+                <Route path="registered-services" element={<RegisteredServices />} />
                 <Route path="freelancers" element={<FreelancerManagement />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="reports" element={<Reports />} />

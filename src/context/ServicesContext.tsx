@@ -23,7 +23,8 @@ interface FormData {
 }
 
 interface RegisteredService extends Omit<Service, 'icon'> {
-  id: string;
+  _id: string;  // MongoDB's _id
+  id: string;   // Original service ID
   status: 'pending' | 'active' | 'completed';
   registrationDate: string;
   formData?: {
@@ -139,7 +140,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       setRegisteredServices(prev =>
         prev.map(service =>
-          service.id === serviceId ? { ...service, status } : service
+          service._id === serviceId ? { ...service, status } : service
         )
       );
     } catch (err) {

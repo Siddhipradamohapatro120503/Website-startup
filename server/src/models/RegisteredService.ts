@@ -1,6 +1,7 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IRegisteredService extends Document {
+  _id: Types.ObjectId;
   serviceId: string;
   name: string;
   description: string;

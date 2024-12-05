@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   VStack,
@@ -6,7 +6,6 @@ import {
   Badge,
   HStack,
   Icon,
-  Button,
   useColorModeValue,
   Accordion,
   AccordionItem,
@@ -20,13 +19,17 @@ import {
   Wrap,
   WrapItem,
   Spinner,
+  IconButton,
+  Collapse,
 } from '@chakra-ui/react';
 import * as Icons from 'react-icons/fa';
-import { FiCheck, FiClock, FiCalendar } from 'react-icons/fi';
+import { FiCheck, FiClock, FiCalendar, FiMessageSquare } from 'react-icons/fi';
 import { useServices } from '../../context/ServicesContext';
+import ServiceChat from '../chat/ServiceChat';
 
 interface RegisteredService {
-  id: string;
+  _id: string;  // MongoDB's _id
+  id: string;   // Original service ID
   name: string;
   category: string;
   status: 'pending' | 'active' | 'completed';
@@ -43,7 +46,8 @@ interface RegisteredService {
 }
 
 const RegisteredServices: React.FC = () => {
-  const { registeredServices, updateServiceStatus, loading, error } = useServices();
+  const { registeredServices, loading, error } = useServices();
+  const [openChat, setOpenChat] = useState<string | null>(null);
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
@@ -67,6 +71,10 @@ const RegisteredServices: React.FC = () => {
       default:
         return 'gray';
     }
+  };
+
+  const toggleChat = (serviceId: string) => {
+    setOpenChat(openChat === serviceId ? null : serviceId);
   };
 
   if (loading) {
@@ -117,10 +125,29 @@ const RegisteredServices: React.FC = () => {
                   </Text>
                 </Box>
               </HStack>
-              <Badge colorScheme={getStatusColor(service.status)}>
-                {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
-              </Badge>
+              <HStack>
+                <Badge colorScheme={getStatusColor(service.status)}>
+                  {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+                </Badge>
+                {service.status === 'active' && (
+                  <IconButton
+                    aria-label="Chat with admin"
+                    icon={<FiMessageSquare />}
+                    variant="ghost"
+                    colorScheme="blue"
+                    onClick={() => toggleChat(service._id)}
+                  />
+                )}
+              </HStack>
             </HStack>
+
+            {service.status === 'active' && (
+              <Collapse in={openChat === service._id} animateOpacity>
+                <Box mt={4}>
+                  <ServiceChat key={service._id} serviceId={service._id} />
+                </Box>
+              </Collapse>
+            )}
 
             <Accordion allowToggle>
               <AccordionItem border="none">
@@ -168,15 +195,6 @@ const RegisteredServices: React.FC = () => {
                 <Text>Duration: {service.duration}</Text>
               </HStack>
             </HStack>
-
-            {service.status === 'pending' && (
-              <Button
-                colorScheme="blue"
-                onClick={() => updateServiceStatus(service.id, 'active')}
-              >
-                Start Service
-              </Button>
-            )}
           </VStack>
         </Box>
       ))}

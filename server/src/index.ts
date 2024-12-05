@@ -8,6 +8,7 @@ import integrationRoutes from './routes/integrationRoutes';
 import authRoutes from './routes/authRoutes';
 import serviceRoutes from './routes/serviceRoutes';
 import registeredServiceRoutes from './routes/registeredServiceRoutes';
+import messageRoutes from './routes/messageRoutes';
 import userRoutes from './routes/userRoutes';
 import { initializeDatabase } from './utils/seedData';
 
@@ -31,6 +32,7 @@ app.use(morgan('dev'));
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/registered-services', registeredServiceRoutes);
+app.use('/api/messages', messageRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/users', userRoutes);

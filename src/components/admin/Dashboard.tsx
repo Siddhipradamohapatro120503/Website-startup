@@ -103,6 +103,9 @@ const SidebarContent = ({ ...rest }) => {
         <NavItem icon={FiBox} path="/admin/services">
           Services
         </NavItem>
+        <NavItem icon={FiGrid} path="/admin/registered-services">
+          Registered Services
+        </NavItem>
         <NavItem icon={FiBriefcase} path="/admin/freelancers">
           Freelancers
         </NavItem>

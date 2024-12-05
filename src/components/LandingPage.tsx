@@ -53,12 +53,10 @@ import {
   FiMessageSquare,
   FiActivity,
   FiZap,
+  FiDownload,
 } from 'react-icons/fi';
-import {
-  useSmoothScroll,
-  ScrollSection,
-} from '../contexts/SmoothScrollContext';
 import Navbar from './navigation/Navbar';
+import Footer from './common/Footer';
 import '../styles/animations.css';
 
 // Pricing tiers data
@@ -443,7 +441,6 @@ export const serviceCategories: ServiceCategory[] = [
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { scrollToSection } = useSmoothScroll();
   const [activeSection, setActiveSection] = useState('hero');
   const [teamSize, setTeamSize] = useState(5);
   const [storageNeeded, setStorageNeeded] = useState(10);
@@ -461,12 +458,17 @@ const LandingPage: React.FC = () => {
       { id: 'hero', label: 'Home' },
       { id: 'services', label: 'Services' },
       { id: 'features', label: 'Features' },
-      { id: 'pricing', label: 'Pricing' },
-      { id: 'comparison', label: 'Compare' },
-      { id: 'contact', label: 'Contact' },
+      { id: 'contactus', label: 'Contact Us' },
     ],
     []
   );
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Calculate estimated price based on team size and storage
   const calculateEstimatedPrice = () => {
@@ -518,7 +520,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* Hero Section */}
-      <ScrollSection id="hero">
+      <Box id="hero">
         <Container maxW="container.xl">
           <Flex
             align="center"
@@ -576,18 +578,20 @@ const LandingPage: React.FC = () => {
                     variant="outline"
                     px={8}
                     borderWidth={2}
+                    onClick={() => window.open('/company-brochure.pdf', '_blank')}
+                    rightIcon={<Icon as={FiDownload} />}
                   >
-                    Learn More
+                    Download Company Brochure
                   </Button>
                 </Stack>
               </motion.div>
             </Box>
           </Flex>
         </Container>
-      </ScrollSection>
+      </Box>
 
       {/* Services Section */}
-      <ScrollSection id="services">
+      <Box id="services">
         <Container maxW="container.xl" py={20}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -695,10 +699,10 @@ const LandingPage: React.FC = () => {
             ))}
           </Grid>
         </Container>
-      </ScrollSection>
+      </Box>
 
       {/* Features Section */}
-      <ScrollSection id="features">
+      <Box id="features">
         <Container maxW="container.xl" py={20}>
           <Heading
             as="h2"
@@ -764,11 +768,25 @@ const LandingPage: React.FC = () => {
               </motion.div>
             ))}
           </Grid>
+          <Box textAlign="center" mt={8}>
+            <Button
+              size="lg"
+              colorScheme="blue"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate('/features');
+              }}
+              rightIcon={<Icon as={FiArrowRight} />}
+            >
+              View All Features
+            </Button>
+          </Box>
         </Container>
-      </ScrollSection>
+      </Box>
 
-      {/* Pricing Section */}
-      <ScrollSection id="pricing">
+      {/* Contact Us Section */}
+      <Box id="contactus">
         <Container maxW="container.xl" py={20}>
           <Heading
             as="h2"
@@ -776,7 +794,7 @@ const LandingPage: React.FC = () => {
             mb={12}
             textAlign="center"
           >
-            Flexible Pricing Plans
+            Let's Work Together
           </Heading>
 
           <Grid
@@ -784,216 +802,127 @@ const LandingPage: React.FC = () => {
             gap={8}
             mb={16}
           >
-            {pricingTiers.map((tier, index) => (
-              <motion.div
-                key={tier.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <Box
+                p={8}
+                borderRadius="xl"
+                bg={cardBgColor}
+                borderWidth={2}
+                borderColor={cardBorderColor}
+                position="relative"
+                _hover={{
+                  transform: 'translateY(-8px)',
+                  boxShadow: 'xl',
+                  borderColor: 'blue.400',
+                }}
+                transition="all 0.3s ease"
               >
-                <Box
-                  p={8}
-                  borderRadius="xl"
-                  bg={cardBgColor}
-                  borderWidth={2}
-                  borderColor={tier.recommended ? highlightColor : cardBorderColor}
-                  position="relative"
-                  _hover={{
-                    transform: 'translateY(-8px)',
-                    boxShadow: 'xl',
-                  }}
-                  transition="all 0.3s ease"
-                >
-                  {tier.recommended && (
-                    <Badge
-                      colorScheme="blue"
-                      position="absolute"
-                      top={-3}
-                      right={-3}
-                      px={3}
-                      py={1}
-                      borderRadius="full"
-                    >
-                      Recommended
-                    </Badge>
-                  )}
-                  <Heading size="lg" mb={4}>
-                    {tier.name}
-                  </Heading>
-                  <Text fontSize="3xl" fontWeight="bold" mb={6}>
-                    ${tier.price}
-                    <Text as="span" fontSize="sm" fontWeight="normal" color={textColor}>
-                      /month
-                    </Text>
-                  </Text>
-                  <Stack spacing={3}>
-                    {tier.features.map((feature) => (
-                      <Flex key={feature} align="center">
-                        <Icon as={FiCheck} color={highlightColor} mr={2} />
-                        <Text>{feature}</Text>
-                      </Flex>
-                    ))}
-                  </Stack>
-                  <Button
-                    mt={8}
-                    w="full"
-                    colorScheme={tier.recommended ? 'blue' : 'gray'}
-                    onClick={onOpen}
-                  >
-                    Get Started
-                  </Button>
-                </Box>
-              </motion.div>
-            ))}
-          </Grid>
-
-          {/* Price Calculator */}
-          <Box
-            p={8}
-            borderRadius="xl"
-            bg={cardBgColor}
-            borderWidth={1}
-            borderColor={cardBorderColor}
-            maxW="3xl"
-            mx="auto"
-          >
-            <Heading size="lg" mb={6}>
-              Calculate Your Custom Price
-            </Heading>
-            <Stack spacing={6}>
-              <Box>
-                <Text mb={2}>Team Size: {teamSize} members</Text>
-                <Slider
-                  value={teamSize}
-                  onChange={(v) => setTeamSize(v)}
-                  min={1}
-                  max={50}
-                >
-                  <SliderTrack>
-                    <SliderFilledTrack />
-                  </SliderTrack>
-                  <SliderThumb />
-                </Slider>
-              </Box>
-              <Box>
-                <Text mb={2}>Storage Needed: {storageNeeded}GB</Text>
-                <Slider
-                  value={storageNeeded}
-                  onChange={(v) => setStorageNeeded(v)}
-                  min={5}
-                  max={500}
-                >
-                  <SliderTrack>
-                    <SliderFilledTrack />
-                  </SliderTrack>
-                  <SliderThumb />
-                </Slider>
-              </Box>
-              <Flex align="center" justify="space-between">
-                <Text fontSize="xl">Estimated Price:</Text>
-                <Text fontSize="2xl" fontWeight="bold" color={highlightColor}>
-                  ${calculateEstimatedPrice().toFixed(2)}/month
+                <Icon as={FiMessageSquare} w={10} h={10} color="blue.400" mb={4} />
+                <Heading size="lg" mb={4}>
+                  Get in Touch
+                </Heading>
+                <Text color={textColor} mb={6}>
+                  Have questions? We're here to help. Send us a message and we'll respond as soon as possible.
                 </Text>
-              </Flex>
-              <Button colorScheme="blue" size="lg" onClick={onOpen}>
-                Get Custom Quote
-              </Button>
-            </Stack>
-          </Box>
-        </Container>
-      </ScrollSection>
+                <Button
+                  w="full"
+                  colorScheme="blue"
+                  onClick={() => navigate('/contact')}
+                  rightIcon={<Icon as={FiArrowRight} />}
+                >
+                  Contact Us
+                </Button>
+              </Box>
+            </motion.div>
 
-      {/* Service Comparison Section */}
-      <ScrollSection id="comparison">
-        <Container maxW="container.xl" py={20}>
-          <Heading
-            as="h2"
-            fontSize={{ base: '3xl', md: '4xl' }}
-            mb={12}
-            textAlign="center"
-          >
-            Compare Plans
-          </Heading>
-          <Box overflowX="auto">
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Feature</Th>
-                  <Th>Starter</Th>
-                  <Th>Professional</Th>
-                  <Th>Enterprise</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {serviceFeatures.map((feature) => (
-                  <Tr key={feature.name}>
-                    <Td>{feature.name}</Td>
-                    <Td>
-                      {feature.starter ? (
-                        <Icon as={FiCheck} color="green.500" />
-                      ) : (
-                        <Text color="red.500">-</Text>
-                      )}
-                    </Td>
-                    <Td>
-                      {feature.pro ? (
-                        <Icon as={FiCheck} color="green.500" />
-                      ) : (
-                        <Text color="red.500">-</Text>
-                      )}
-                    </Td>
-                    <Td>
-                      {feature.enterprise ? (
-                        <Icon as={FiCheck} color="green.500" />
-                      ) : (
-                        <Text color="red.500">-</Text>
-                      )}
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Box>
-        </Container>
-      </ScrollSection>
-
-      {/* Contact Section */}
-      <ScrollSection id="contact">
-        <Container maxW="container.xl" py={20}>
-          <Heading
-            as="h2"
-            fontSize={{ base: '3xl', md: '4xl' }}
-            mb={12}
-            textAlign="center"
-          >
-            Get in Touch
-          </Heading>
-          <Box
-            p={8}
-            borderRadius="xl"
-            bg={cardBgColor}
-            borderWidth={1}
-            borderColor={cardBorderColor}
-            maxW="xl"
-            mx="auto"
-          >
-            <Stack spacing={4}>
-              <Text color={textColor} textAlign="center" fontSize="lg">
-                Ready to transform your digital presence? Contact us today to get
-                started on your journey to success.
-              </Text>
-              <Button
-                size="lg"
-                colorScheme="blue"
-                rightIcon={<Icon as={FiArrowRight} />}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <Box
+                p={8}
+                borderRadius="xl"
+                bg={cardBgColor}
+                borderWidth={2}
+                borderColor={cardBorderColor}
+                position="relative"
+                _hover={{
+                  transform: 'translateY(-8px)',
+                  boxShadow: 'xl',
+                  borderColor: 'blue.400',
+                }}
+                transition="all 0.3s ease"
               >
-                Contact Us
-              </Button>
-            </Stack>
-          </Box>
+                <Icon as={FiActivity} w={10} h={10} color="blue.400" mb={4} />
+                <Heading size="lg" mb={4}>
+                  Schedule Demo
+                </Heading>
+                <Text color={textColor} mb={6}>
+                  See our solutions in action. Book a personalized demo with our product experts.
+                </Text>
+                <Button
+                  w="full"
+                  colorScheme="blue"
+                  variant="outline"
+                  onClick={onOpen}
+                  rightIcon={<Icon as={FiArrowRight} />}
+                >
+                  Book Demo
+                </Button>
+              </Box>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <Box
+                p={8}
+                borderRadius="xl"
+                bg={cardBgColor}
+                borderWidth={2}
+                borderColor={cardBorderColor}
+                position="relative"
+                _hover={{
+                  transform: 'translateY(-8px)',
+                  boxShadow: 'xl',
+                  borderColor: 'blue.400',
+                }}
+                transition="all 0.3s ease"
+              >
+                <Icon as={FiZap} w={10} h={10} color="blue.400" mb={4} />
+                <Heading size="lg" mb={4}>
+                  Quick Start
+                </Heading>
+                <Text color={textColor} mb={6}>
+                  Ready to begin? Start your journey with our quick onboarding process.
+                </Text>
+                <Button
+                  w="full"
+                  colorScheme="blue"
+                  variant="outline"
+                  onClick={() => navigate('/signup')}
+                  rightIcon={<Icon as={FiArrowRight} />}
+                >
+                  Get Started
+                </Button>
+              </Box>
+            </motion.div>
+          </Grid>
         </Container>
-      </ScrollSection>
+      </Box>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Quote Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="lg">

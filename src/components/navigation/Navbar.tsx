@@ -24,19 +24,19 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   {
     label: 'Home',
-    href: '#home',
+    href: '/',
   },
   {
     label: 'Features',
-    href: '#features',
+    href: '/features',
   },
   {
     label: 'About',
-    href: '#about',
+    href: '/about',
   },
   {
     label: 'Contact',
-    href: '#contact',
+    href: '/contact',
   },
 ];
 
@@ -51,8 +51,14 @@ export default function Navbar() {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   const handleNavClick = (href: string) => {
-    const sectionId = href.replace('#', '');
-    scrollToSection(sectionId);
+    if (href === '/') {
+      navigate(href);
+    } else if (href.startsWith('#')) {
+      const sectionId = href.replace('#', '');
+      scrollToSection(sectionId);
+    } else {
+      navigate(href);
+    }
   };
 
   const handleGetStarted = () => {
@@ -96,6 +102,8 @@ export default function Navbar() {
               color={textColor}
               fontWeight="bold"
               fontSize="xl"
+              cursor="pointer"
+              onClick={() => navigate('/')}
             >
               Startup
             </Text>

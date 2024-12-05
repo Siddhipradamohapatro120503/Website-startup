@@ -4,163 +4,183 @@ import {
   VStack,
   Text,
   Badge,
-  Progress,
   HStack,
   Icon,
   Button,
   useColorModeValue,
-  SimpleGrid,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  List,
+  ListItem,
+  ListIcon,
+  Tag,
+  Wrap,
+  WrapItem,
+  Spinner,
 } from '@chakra-ui/react';
-import { FiClock, FiCalendar, FiBarChart2 } from 'react-icons/fi';
+import * as Icons from 'react-icons/fa';
+import { FiCheck, FiClock, FiCalendar } from 'react-icons/fi';
+import { useServices } from '../../context/ServicesContext';
 
 interface RegisteredService {
   id: string;
   name: string;
-  progress: number;
-  nextSession: string;
-  hoursUsed: number;
-  totalHours: number;
-  status: 'active' | 'completed' | 'paused';
+  category: string;
+  status: 'pending' | 'active' | 'completed';
+  formData?: {
+    preferredDate?: string;
+    preferredTime?: string;
+    specialRequirements?: string;
+    paymentMethod?: string;
+  };
+  duration: string;
+  features: string[];
+  technologies: string[];
+  iconName: string;
 }
 
-const registeredServices: RegisteredService[] = [
-  {
-    id: '1',
-    name: 'Business Consulting',
-    progress: 65,
-    nextSession: '2024-02-15T10:00:00',
-    hoursUsed: 12,
-    totalHours: 20,
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Digital Marketing',
-    progress: 40,
-    nextSession: '2024-02-16T14:00:00',
-    hoursUsed: 8,
-    totalHours: 30,
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'Web Development',
-    progress: 90,
-    nextSession: '2024-02-14T15:00:00',
-    hoursUsed: 45,
-    totalHours: 50,
-    status: 'active',
-  },
-];
-
 const RegisteredServices: React.FC = () => {
+  const { registeredServices, updateServiceStatus, loading, error } = useServices();
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Not specified';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending':
+        return 'yellow';
       case 'active':
         return 'green';
       case 'completed':
         return 'blue';
-      case 'paused':
-        return 'orange';
       default:
         return 'gray';
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  if (loading) {
+    return (
+      <Box p={6} textAlign="center">
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={6} textAlign="center" color="red.500">
+        <Text>{error}</Text>
+      </Box>
+    );
+  }
+
+  if (!registeredServices || registeredServices.length === 0) {
+    return (
+      <Box p={6} textAlign="center">
+        <Text>No registered services yet.</Text>
+      </Box>
+    );
+  }
 
   return (
-    <SimpleGrid columns={{ base: 1, xl: 2 }} spacing={4}>
+    <VStack spacing={4} align="stretch">
       {registeredServices.map((service) => (
         <Box
           key={service.id}
           p={6}
-          bg={bgColor}
           borderRadius="lg"
           borderWidth={1}
           borderColor={borderColor}
+          bg={bgColor}
         >
           <VStack align="stretch" spacing={4}>
             <HStack justify="space-between">
-              <Text fontWeight="bold" fontSize="lg">
-                {service.name}
-              </Text>
+              <HStack spacing={4}>
+                <Icon as={Icons[service.iconName as keyof typeof Icons]} boxSize={6} color="blue.500" />
+                <Box>
+                  <Text fontWeight="bold" fontSize="lg">
+                    {service.name}
+                  </Text>
+                  <Text color="gray.600" fontSize="sm">
+                    {service.category}
+                  </Text>
+                </Box>
+              </HStack>
               <Badge colorScheme={getStatusColor(service.status)}>
-                {service.status}
+                {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
               </Badge>
             </HStack>
 
-            <Box>
-              <HStack justify="space-between" mb={2}>
-                <Text fontSize="sm" color="gray.600">
-                  Progress
-                </Text>
-                <Text fontSize="sm" fontWeight="medium">
-                  {service.progress}%
-                </Text>
-              </HStack>
-              <Progress
-                value={service.progress}
-                colorScheme="blue"
-                size="sm"
-                borderRadius="full"
-              />
-            </Box>
+            <Accordion allowToggle>
+              <AccordionItem border="none">
+                <AccordionButton px={0}>
+                  <Box flex="1" textAlign="left">
+                    <Text fontWeight="medium">Service Details</Text>
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel pb={4} px={0}>
+                  <VStack align="stretch" spacing={4}>
+                    <List spacing={2}>
+                      {service.features.map((feature, index) => (
+                        <ListItem key={index}>
+                          <ListIcon as={FiCheck} color="green.500" />
+                          {feature}
+                        </ListItem>
+                      ))}
+                    </List>
 
-            <SimpleGrid columns={2} spacing={4}>
+                    {service.technologies && service.technologies.length > 0 && (
+                      <Box>
+                        <Text fontWeight="bold" mb={2}>Technologies:</Text>
+                        <Wrap spacing={2}>
+                          {service.technologies.map((tech) => (
+                            <WrapItem key={tech}>
+                              <Tag size="sm" colorScheme="purple">{tech}</Tag>
+                            </WrapItem>
+                          ))}
+                        </Wrap>
+                      </Box>
+                    )}
+                  </VStack>
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+
+            <HStack spacing={6}>
               <HStack>
-                <Icon as={FiClock} color="blue.500" />
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" color="gray.600">
-                    Hours Used
-                  </Text>
-                  <Text fontSize="sm" fontWeight="medium">
-                    {service.hoursUsed}/{service.totalHours}
-                  </Text>
-                </VStack>
+                <Icon as={FiCalendar} />
+                <Text>Start Date: {formatDate(service.formData?.preferredDate)}</Text>
               </HStack>
-
               <HStack>
-                <Icon as={FiCalendar} color="purple.500" />
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" color="gray.600">
-                    Next Session
-                  </Text>
-                  <Text fontSize="sm" fontWeight="medium">
-                    {formatDate(service.nextSession)}
-                  </Text>
-                </VStack>
+                <Icon as={FiClock} />
+                <Text>Duration: {service.duration}</Text>
               </HStack>
-            </SimpleGrid>
-
-            <HStack spacing={2}>
-              <Button size="sm" colorScheme="blue" variant="outline" flex={1}>
-                View Details
-              </Button>
-              <Button
-                size="sm"
-                leftIcon={<FiBarChart2 />}
-                colorScheme="blue"
-                flex={1}
-              >
-                Track Progress
-              </Button>
             </HStack>
+
+            {service.status === 'pending' && (
+              <Button
+                colorScheme="blue"
+                onClick={() => updateServiceStatus(service.id, 'active')}
+              >
+                Start Service
+              </Button>
+            )}
           </VStack>
         </Box>
       ))}
-    </SimpleGrid>
+    </VStack>
   );
 };
 

@@ -17,6 +17,9 @@ import Reports from './components/admin/sections/Reports';
 import Integrations from './components/admin/sections/Integrations';
 import ServiceDetails from './components/ServiceDetails';
 import ServiceDetailPage from './components/ServiceDetailPage';
+import Features from './components/Features';
+import About from './components/About';
+import Contact from './components/Contact';
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/" element={<LandingPage />} />
+              <Route path="/features" element={<Features />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/services/:categoryId" element={<ServiceDetails />} />
               <Route path="/services/:categoryId/:serviceId" element={<ServiceDetailPage />} />
               

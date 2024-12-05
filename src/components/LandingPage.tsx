@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { IconType } from 'react-icons';
 import {
   Box,
   Container,
@@ -52,7 +54,10 @@ import {
   FiActivity,
   FiZap,
 } from 'react-icons/fi';
-import { useSmoothScroll, ScrollSection } from '../contexts/SmoothScrollContext';
+import {
+  useSmoothScroll,
+  ScrollSection,
+} from '../contexts/SmoothScrollContext';
 import Navbar from './navigation/Navbar';
 import '../styles/animations.css';
 
@@ -67,13 +72,25 @@ const pricingTiers = [
   {
     name: 'Professional',
     price: 99,
-    features: ['Advanced Analytics', '15 Team Members', '50GB Storage', 'Priority Support', 'Custom Domain'],
+    features: [
+      'Advanced Analytics',
+      '15 Team Members',
+      '50GB Storage',
+      'Priority Support',
+      'Custom Domain',
+    ],
     recommended: true,
   },
   {
     name: 'Enterprise',
     price: 299,
-    features: ['Custom Analytics', 'Unlimited Team Members', '500GB Storage', '24/7 Support', 'Custom Integration'],
+    features: [
+      'Custom Analytics',
+      'Unlimited Team Members',
+      '500GB Storage',
+      '24/7 Support',
+      'Custom Integration',
+    ],
     recommended: false,
   },
 ];
@@ -88,8 +105,115 @@ const serviceFeatures = [
   { name: 'Custom Integration', starter: false, pro: false, enterprise: true },
 ];
 
+// Types
+interface Service {
+  name: string;
+  icon: IconType;
+  features: string[];
+  description?: string;
+  technologies?: string[];
+  useCases?: string[];
+  brochureUrl?: string;
+}
+
+interface ServiceCategory {
+  title: string;
+  icon: IconType;
+  services: Service[];
+}
+
 // Service data
-const serviceCategories = [
+export const serviceCategories: ServiceCategory[] = [
+  {
+    title: 'AI & Machine Learning',
+    icon: FiCpu,
+    services: [
+      {
+        name: 'Custom AI Solutions',
+        icon: FiSettings,
+        features: [
+          'Custom AI Model Development',
+          'Deep Learning Solutions',
+          'Neural Network Architecture',
+          'Model Training & Optimization',
+          'AI Integration Services',
+          'Performance Monitoring',
+        ],
+        description: 'Tailored AI solutions designed to meet your specific business needs',
+        technologies: ['TensorFlow', 'PyTorch', 'Scikit-learn', 'CUDA'],
+        useCases: [
+          'Predictive Analytics',
+          'Pattern Recognition',
+          'Decision Support Systems',
+          'Automated Decision Making',
+        ],
+        brochureUrl: '/brochures/ai-ml/custom-ai-solutions.pdf',
+      },
+      {
+        name: 'Computer Vision',
+        icon: FiCamera,
+        features: [
+          'Image Recognition & Classification',
+          'Object Detection & Tracking',
+          'Facial Recognition Systems',
+          'Video Analysis',
+          'OCR Implementation',
+          'Visual Quality Control',
+        ],
+        description: 'Advanced computer vision solutions for image and video analysis',
+        technologies: ['OpenCV', 'TensorFlow Vision', 'YOLO', 'ResNet'],
+        useCases: [
+          'Quality Control Automation',
+          'Security & Surveillance',
+          'Medical Image Analysis',
+          'Retail Analytics',
+        ],
+        brochureUrl: '/brochures/ai-ml/computer-vision.pdf',
+      },
+      {
+        name: 'Natural Language Processing',
+        icon: FiMessageSquare,
+        features: [
+          'Text Classification & Analysis',
+          'Sentiment Analysis',
+          'Named Entity Recognition',
+          'Language Translation',
+          'Chatbot Development',
+          'Text Summarization',
+        ],
+        description: 'Powerful NLP solutions for text and language processing',
+        technologies: ['BERT', 'GPT', 'spaCy', 'NLTK'],
+        useCases: [
+          'Customer Service Automation',
+          'Content Analysis',
+          'Document Processing',
+          'Market Intelligence',
+        ],
+        brochureUrl: '/brochures/ai-ml/nlp.pdf',
+      },
+      {
+        name: 'Predictive Analytics',
+        icon: FiTrendingUp,
+        features: [
+          'Time Series Analysis',
+          'Forecasting Models',
+          'Risk Assessment',
+          'Anomaly Detection',
+          'Pattern Recognition',
+          'Prescriptive Analytics',
+        ],
+        description: 'Data-driven predictive analytics for business intelligence',
+        technologies: ['Prophet', 'StatsModels', 'R', 'ARIMA'],
+        useCases: [
+          'Sales Forecasting',
+          'Risk Management',
+          'Demand Prediction',
+          'Resource Optimization',
+        ],
+        brochureUrl: '/brochures/ai-ml/predictive-analytics.pdf',
+      },
+    ],
+  },
   {
     title: 'Content Creation',
     icon: FiCamera,
@@ -101,9 +225,18 @@ const serviceCategories = [
           'Long-form Content',
           'Social Media Clips',
           'Promotional Videos',
-          'Motion Graphics'
+          'Motion Graphics',
         ],
-        icon: FiFilm
+        icon: FiFilm,
+        description: 'Professional video editing services for all your content needs',
+        technologies: ['Adobe Premiere Pro', 'After Effects', 'DaVinci Resolve', 'Final Cut Pro'],
+        useCases: [
+          'Social Media Content',
+          'Marketing Videos',
+          'Corporate Presentations',
+          'Event Coverage',
+        ],
+        brochureUrl: '/brochures/content/video-editing.pdf',
       },
       {
         name: 'Graphic Design',
@@ -112,11 +245,20 @@ const serviceCategories = [
           'Marketing Materials',
           'Social Media Graphics',
           'Illustration',
-          'Packaging'
+          'Packaging',
         ],
-        icon: FiPenTool
-      }
-    ]
+        icon: FiPenTool,
+        description: 'Creative graphic design solutions for your brand',
+        technologies: ['Adobe Photoshop', 'Illustrator', 'InDesign', 'Figma'],
+        useCases: [
+          'Brand Identity',
+          'Marketing Collateral',
+          'Social Media Assets',
+          'Print Materials',
+        ],
+        brochureUrl: '/brochures/content/graphic-design.pdf',
+      },
+    ],
   },
   {
     title: 'Digital Marketing',
@@ -129,9 +271,18 @@ const serviceCategories = [
           'Community Management',
           'Multi-platform Support',
           'Analytics & Reporting',
-          'Growth Metrics'
+          'Growth Metrics',
         ],
-        icon: FiShare2
+        icon: FiShare2,
+        description: 'Comprehensive social media management services',
+        technologies: ['Hootsuite', 'Buffer', 'Sprout Social', 'Later'],
+        useCases: [
+          'Brand Building',
+          'Community Engagement',
+          'Lead Generation',
+          'Brand Awareness',
+        ],
+        brochureUrl: '/brochures/marketing/social-media-management.pdf',
       },
       {
         name: 'Social Media Marketing',
@@ -140,37 +291,64 @@ const serviceCategories = [
           'Campaign Management',
           'Budget Optimization',
           'Performance Tracking',
-          'Competitor Analysis'
+          'Competitor Analysis',
         ],
-        icon: FiBarChart2
-      }
-    ]
+        icon: FiBarChart2,
+        description: 'Strategic social media marketing solutions',
+        technologies: ['Facebook Ads', 'Google Ads', 'LinkedIn Ads', 'Twitter Ads'],
+        useCases: [
+          'Lead Generation',
+          'Brand Awareness',
+          'Product Launch',
+          'Event Promotion',
+        ],
+        brochureUrl: '/brochures/marketing/social-media-marketing.pdf',
+      },
+    ],
   },
   {
     title: 'Development',
     icon: FiCode,
     services: [
       {
-        name: 'Website Development',
+        name: 'Web Development',
         features: [
-          'Static & Dynamic Websites',
+          'Responsive Design',
           'E-commerce Solutions',
           'CMS Integration',
           'SEO Optimization',
-          'Maintenance & Support'
+          'Maintenance & Support',
         ],
-        icon: FiGlobe
+        icon: FiGlobe,
+        description: 'Custom web development solutions for your business',
+        technologies: ['React', 'Node.js', 'PHP', 'WordPress'],
+        useCases: [
+          'Business Websites',
+          'E-commerce Platforms',
+          'Web Applications',
+          'Corporate Portals',
+        ],
+        brochureUrl: '/brochures/development/web-development.pdf',
       },
       {
         name: 'Web App Design',
         features: [
-          'User Interface Design',
+          'UI Design',
           'Interaction Design',
           'Wireframing',
           'Prototyping',
-          'Documentation'
+          'Documentation',
         ],
-        icon: FiLayout
+        icon: FiLayout,
+        description: 'Modern web application design services',
+        technologies: ['Figma', 'Adobe XD', 'Sketch', 'InVision'],
+        useCases: [
+          'SaaS Applications',
+          'Admin Dashboards',
+          'Customer Portals',
+          'Mobile Web Apps',
+        ],
+        brochureUrl: '/brochures/development/web-app-design.pdf',
       },
       {
         name: 'UI/UX Design',
@@ -179,26 +357,45 @@ const serviceCategories = [
           'Information Architecture',
           'Visual Design',
           'Usability Testing',
-          'Design Systems'
+          'Design Systems',
         ],
-        icon: FiGrid
-      }
-    ]
+        icon: FiGrid,
+        description: 'User-centered UI/UX design services',
+        technologies: ['Figma', 'Sketch', 'Adobe XD', 'Zeplin'],
+        useCases: [
+          'Mobile Apps',
+          'Web Applications',
+          'E-commerce',
+          'Enterprise Systems',
+        ],
+        brochureUrl: '/brochures/development/ui-ux-design.pdf',
+      },
+    ],
   },
   {
     title: 'Technical Solutions',
     icon: FiSettings,
     services: [
       {
-        name: 'IoT Solutions',
+        name: 'Infrastructure Setup',
         features: [
-          'System Design',
-          'Hardware Integration',
+          'Network Design',
+          'Server Configuration',
+          'Security Implementation',
           'Software Development',
           'Monitoring Systems',
-          'Maintenance'
+          'Maintenance',
         ],
-        icon: FiCpu
+        icon: FiCpu,
+        description: 'Enterprise-grade infrastructure solutions',
+        technologies: ['VMware', 'Cisco', 'Microsoft Server', 'Linux'],
+        useCases: [
+          'Data Centers',
+          'Cloud Infrastructure',
+          'Network Security',
+          'System Integration',
+        ],
+        brochureUrl: '/brochures/technical/infrastructure-setup.pdf',
       },
       {
         name: 'Cloud Solutions',
@@ -207,9 +404,18 @@ const serviceCategories = [
           'Cloud Migration',
           'Optimization',
           'Security',
-          'Maintenance'
+          'Maintenance',
         ],
-        icon: FiCloud
+        icon: FiCloud,
+        description: 'Comprehensive cloud computing solutions',
+        technologies: ['AWS', 'Azure', 'Google Cloud', 'Kubernetes'],
+        useCases: [
+          'Cloud Migration',
+          'Hybrid Cloud',
+          'Cloud Security',
+          'Cost Optimization',
+        ],
+        brochureUrl: '/brochures/technical/cloud-solutions.pdf',
       },
       {
         name: 'DevOps Solutions',
@@ -218,43 +424,25 @@ const serviceCategories = [
           'Infrastructure as Code',
           'Monitoring Setup',
           'Kubernetes Deployment',
-          'Automation'
+          'Automation',
         ],
-        icon: FiServer
-      }
-    ]
-  },
-  {
-    title: 'AI/ML Services',
-    icon: FiZap, // Changed from FiBrain to FiZap as it's a good representation of AI/ML processing power
-    services: [
-      {
-        name: 'AI Chatbots',
-        features: [
-          'Customer Service',
-          'Lead Generation',
-          'Internal Support',
-          'E-commerce Integration',
-          'NLP Processing'
+        icon: FiServer,
+        description: 'End-to-end DevOps implementation services',
+        technologies: ['Jenkins', 'Docker', 'Kubernetes', 'Terraform'],
+        useCases: [
+          'Continuous Integration',
+          'Automated Deployment',
+          'Container Orchestration',
+          'Infrastructure Automation',
         ],
-        icon: FiMessageSquare
+        brochureUrl: '/brochures/technical/devops-solutions.pdf',
       },
-      {
-        name: 'ML Solutions',
-        features: [
-          'Data Analysis',
-          'Predictive Modeling',
-          'Pattern Recognition',
-          'Custom Algorithms',
-          'Model Training'
-        ],
-        icon: FiActivity
-      }
-    ]
-  }
+    ],
+  },
 ];
 
 const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
   const { scrollToSection } = useSmoothScroll();
   const [activeSection, setActiveSection] = useState('hero');
   const [teamSize, setTeamSize] = useState(5);
@@ -266,23 +454,29 @@ const LandingPage: React.FC = () => {
   const cardBgColor = useColorModeValue('white', 'gray.800');
   const cardBorderColor = useColorModeValue('gray.200', 'gray.700');
   const highlightColor = useColorModeValue('blue.500', 'blue.300');
+  const hoverBgColor = useColorModeValue('gray.50', 'gray.700');
 
-  const sections = useMemo(() => [
-    { id: 'hero', label: 'Home' },
-    { id: 'services', label: 'Services' },
-    { id: 'features', label: 'Features' },
-    { id: 'pricing', label: 'Pricing' },
-    { id: 'comparison', label: 'Compare' },
-    { id: 'contact', label: 'Contact' },
-  ], []);
+  const sections = useMemo(
+    () => [
+      { id: 'hero', label: 'Home' },
+      { id: 'services', label: 'Services' },
+      { id: 'features', label: 'Features' },
+      { id: 'pricing', label: 'Pricing' },
+      { id: 'comparison', label: 'Compare' },
+      { id: 'contact', label: 'Contact' },
+    ],
+    []
+  );
 
   // Calculate estimated price based on team size and storage
   const calculateEstimatedPrice = () => {
     const basePrice = 29;
     const pricePerTeamMember = 10;
     const pricePerGB = 0.5;
-    
-    return basePrice + (teamSize * pricePerTeamMember) + (storageNeeded * pricePerGB);
+
+    return (
+      basePrice + teamSize * pricePerTeamMember + storageNeeded * pricePerGB
+    );
   };
 
   useEffect(() => {
@@ -431,6 +625,10 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
                 viewport={{ once: true }}
+                onClick={() =>
+                  navigate(`/services/${category.title.toLowerCase().replace(/\s+/g, '-')}`)
+                }
+                style={{ cursor: 'pointer' }}
               >
                 <Box
                   bg={cardBgColor}
@@ -439,6 +637,11 @@ const LandingPage: React.FC = () => {
                   borderWidth={1}
                   borderColor={cardBorderColor}
                   height="100%"
+                  _hover={{
+                    transform: 'translateY(-4px)',
+                    boxShadow: 'lg',
+                    transition: 'all 0.3s ease',
+                  }}
                 >
                   <Icon
                     as={category.icon}
@@ -449,35 +652,44 @@ const LandingPage: React.FC = () => {
                   <Heading size="lg" mb={6}>
                     {category.title}
                   </Heading>
-                  <Stack spacing={6}>
-                    {category.services.map((service) => (
-                      <Box key={service.name}>
-                        <Flex align="center" mb={3}>
-                          <Icon as={service.icon} mr={2} />
-                          <Text fontSize="lg" fontWeight="bold">
-                            {service.name}
-                          </Text>
+                  <Stack spacing={4}>
+                    {category.services.map((service, index) => (
+                      <Box
+                        key={service.name}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(
+                            `/services/${category.title.toLowerCase().replace(/\s+/g, '-')}/${
+                              service.name.toLowerCase().replace(/\s+/g, '-')
+                            }`
+                          );
+                        }}
+                        cursor="pointer"
+                        p={4}
+                        borderRadius="md"
+                        borderWidth={1}
+                        borderColor={cardBorderColor}
+                        _hover={{
+                          bg: hoverBgColor,
+                          transform: 'translateX(4px)',
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        <Flex align="center" justify="space-between">
+                          <Box>
+                            <Text fontWeight="semibold" mb={2}>
+                              {service.name}
+                            </Text>
+                            <Text color={textColor} fontSize="sm">
+                              {service.features[0]}
+                              {service.features.length > 1 && '...'}
+                            </Text>
+                          </Box>
+                          <Icon as={FiArrowRight} />
                         </Flex>
-                        <Stack spacing={2}>
-                          {service.features.map((feature) => (
-                            <Flex key={feature} align="center">
-                              <Icon as={FiCheck} color="green.500" mr={2} />
-                              <Text>{feature}</Text>
-                            </Flex>
-                          ))}
-                        </Stack>
                       </Box>
                     ))}
                   </Stack>
-                  <Button
-                    mt={6}
-                    colorScheme="blue"
-                    rightIcon={<FiArrowRight />}
-                    onClick={onOpen}
-                    width="full"
-                  >
-                    Learn More
-                  </Button>
                 </Box>
               </motion.div>
             ))}
@@ -566,7 +778,7 @@ const LandingPage: React.FC = () => {
           >
             Flexible Pricing Plans
           </Heading>
-          
+
           <Grid
             templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
             gap={8}
@@ -768,7 +980,8 @@ const LandingPage: React.FC = () => {
           >
             <Stack spacing={4}>
               <Text color={textColor} textAlign="center" fontSize="lg">
-                Ready to transform your digital presence? Contact us today to get started on your journey to success.
+                Ready to transform your digital presence? Contact us today to get
+                started on your journey to success.
               </Text>
               <Button
                 size="lg"
@@ -790,8 +1003,8 @@ const LandingPage: React.FC = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <Text mb={4}>
-              Thank you for your interest! Our team will contact you shortly with a custom quote
-              tailored to your needs.
+              Thank you for your interest! Our team will contact you shortly with a
+              custom quote tailored to your needs.
             </Text>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close

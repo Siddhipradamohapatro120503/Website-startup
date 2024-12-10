@@ -21,39 +21,43 @@ const reportRoutes_1 = __importDefault(require("./routes/reportRoutes"));
 const integrationRoutes_1 = __importDefault(require("./routes/integrationRoutes"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const serviceRoutes_1 = __importDefault(require("./routes/serviceRoutes"));
-const admin_1 = __importDefault(require("./routes/admin"));
+const registeredServiceRoutes_1 = __importDefault(require("./routes/registeredServiceRoutes"));
+const messageRoutes_1 = __importDefault(require("./routes/messageRoutes"));
+const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
+const freelancer_routes_1 = __importDefault(require("./routes/freelancer.routes"));
 const seedData_1 = require("./utils/seedData");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-// Configure CORS
-app.use((0, cors_1.default)({
-    origin: 'http://localhost:3000', // React app URL
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
 // Middleware
+app.use((0, cors_1.default)({
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Accept-Language', 'Accept-Encoding'],
+    exposedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Accept-Language', 'Accept-Encoding'],
+    maxAge: 3600,
+    credentials: true
+}));
 app.use(express_1.default.json());
 app.use((0, morgan_1.default)('dev'));
-// Debug middleware
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    console.log('Headers:', req.headers);
-    next();
-});
 // Routes
 app.use('/api/auth', authRoutes_1.default);
 app.use('/api/services', serviceRoutes_1.default);
+app.use('/api/registered-services', registeredServiceRoutes_1.default);
+app.use('/api/messages', messageRoutes_1.default);
 app.use('/api/reports', reportRoutes_1.default);
 app.use('/api/integrations', integrationRoutes_1.default);
-app.use('/api/admin', admin_1.default);
+app.use('/api/users', userRoutes_1.default);
+app.use('/api/freelancers', freelancer_routes_1.default);
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/startup-platform';
+const PORT = process.env.PORT || 5000;
 mongoose_1.default.connect(MONGODB_URI)
     .then(() => __awaiter(void 0, void 0, void 0, function* () {
     console.log('Connected to MongoDB');
-    // Seed database with initial data
     yield (0, seedData_1.initializeDatabase)();
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
 }))
     .catch((error) => {
     console.error('MongoDB connection error:', error);
@@ -62,8 +66,4 @@ mongoose_1.default.connect(MONGODB_URI)
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Something went wrong!' });
-});
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });

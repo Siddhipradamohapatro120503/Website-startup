@@ -34,40 +34,40 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const registeredServiceSchema = new mongoose_1.Schema({
-    serviceId: {
-        type: String,
-        required: true
-    },
-    name: {
-        type: String,
-        required: true
-    },
-    description: String,
-    duration: String,
-    category: String,
-    features: [String],
-    technologies: [String],
-    useCases: [String],
-    iconName: String,
+const skillSchema = new mongoose_1.Schema({
+    name: { type: String, required: true },
+    level: { type: Number, required: true, min: 0, max: 100 }
+});
+const projectSchema = new mongoose_1.Schema({
+    name: { type: String, required: true },
     status: {
         type: String,
-        enum: ['pending', 'active', 'completed'],
-        default: 'pending'
+        enum: ['completed', 'in-progress', 'cancelled'],
+        default: 'in-progress'
     },
-    registrationDate: {
-        type: Date,
-        default: Date.now
-    },
-    userEmail: {
-        type: String,
-        required: true
-    },
-    formData: {
-        preferredDate: String,
-        preferredTime: String,
-        specialRequirements: String,
-        paymentMethod: String
-    }
+    clientRating: { type: Number, min: 0, max: 5 }
 });
-exports.default = mongoose_1.default.model('RegisteredService', registeredServiceSchema);
+const freelancerSchema = new mongoose_1.Schema({
+    name: { type: String, required: true },
+    avatar: { type: String },
+    title: { type: String, required: true },
+    skills: [skillSchema],
+    rating: { type: Number, default: 0, min: 0, max: 5 },
+    projects: [projectSchema],
+    availability: {
+        status: {
+            type: String,
+            enum: ['available', 'busy', 'unavailable'],
+            default: 'available'
+        },
+        nextAvailable: { type: Date }
+    },
+    metrics: {
+        completedProjects: { type: Number, default: 0 },
+        totalEarnings: { type: Number, default: 0 },
+        avgResponseTime: { type: String }
+    }
+}, {
+    timestamps: true
+});
+exports.default = mongoose_1.default.model('Freelancer', freelancerSchema);

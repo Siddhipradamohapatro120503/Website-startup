@@ -10,6 +10,7 @@ import serviceRoutes from './routes/serviceRoutes';
 import registeredServiceRoutes from './routes/registeredServiceRoutes';
 import messageRoutes from './routes/messageRoutes';
 import userRoutes from './routes/userRoutes';
+import freelancerRoutes from './routes/freelancerRoutes';
 import { initializeDatabase } from './utils/seedData';
 
 dotenv.config();
@@ -36,6 +37,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/freelancers', freelancerRoutes);
 
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/startup-platform';

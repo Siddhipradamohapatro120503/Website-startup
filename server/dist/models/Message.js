@@ -34,40 +34,33 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const registeredServiceSchema = new mongoose_1.Schema({
+const messageSchema = new mongoose_1.Schema({
     serviceId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        required: true,
+        ref: 'RegisteredService'
+    },
+    senderId: {
+        type: String,
+        required: true,
+        ref: 'User'
+    },
+    senderRole: {
+        type: String,
+        enum: ['user', 'admin'],
+        required: true
+    },
+    content: {
         type: String,
         required: true
     },
-    name: {
-        type: String,
-        required: true
-    },
-    description: String,
-    duration: String,
-    category: String,
-    features: [String],
-    technologies: [String],
-    useCases: [String],
-    iconName: String,
-    status: {
-        type: String,
-        enum: ['pending', 'active', 'completed'],
-        default: 'pending'
-    },
-    registrationDate: {
+    timestamp: {
         type: Date,
         default: Date.now
     },
-    userEmail: {
-        type: String,
-        required: true
-    },
-    formData: {
-        preferredDate: String,
-        preferredTime: String,
-        specialRequirements: String,
-        paymentMethod: String
+    read: {
+        type: Boolean,
+        default: false
     }
 });
-exports.default = mongoose_1.default.model('RegisteredService', registeredServiceSchema);
+exports.default = mongoose_1.default.model('Message', messageSchema);

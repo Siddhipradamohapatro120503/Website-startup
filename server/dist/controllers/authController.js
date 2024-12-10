@@ -24,12 +24,10 @@ const generateToken = (user) => {
 };
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('Registering new user:', req.body);
         const { email, password, firstName, lastName } = req.body;
         // Check if user already exists
         const existingUser = yield User_1.default.findOne({ email });
         if (existingUser) {
-            console.log('User already exists:', email);
             return res.status(400).json({ message: 'User already exists' });
         }
         // Create new user
@@ -40,7 +38,6 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             lastName,
         });
         yield user.save();
-        console.log('New user created:', user._id);
         // Generate token
         const token = generateToken(user);
         res.status(201).json({
@@ -55,36 +52,26 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.error('Error registering user:', error);
-        if (error instanceof Error) {
-            res.status(500).json({ message: 'Error registering user', error: error.message });
-        }
-        else {
-            res.status(500).json({ message: 'Error registering user', error: 'Unknown error occurred' });
-        }
+        res.status(500).json({ message: 'Error registering user', error });
     }
 });
 exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('Login attempt for user:', req.body.email);
         const { email, password } = req.body;
         // Find user
         const user = yield User_1.default.findOne({ email });
         if (!user) {
-            console.log('User not found:', email);
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         // Check password
         const isMatch = yield user.comparePassword(password);
         if (!isMatch) {
-            console.log('Invalid password for user:', email);
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         // Update last login
         user.lastLogin = new Date();
         yield user.save();
-        console.log('User logged in successfully:', user._id);
         // Generate token
         const token = generateToken(user);
         res.json({
@@ -99,38 +86,21 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.error('Error logging in:', error);
-        if (error instanceof Error) {
-            res.status(500).json({ message: 'Error logging in', error: error.message });
-        }
-        else {
-            res.status(500).json({ message: 'Error logging in', error: 'Unknown error occurred' });
-        }
+        res.status(500).json({ message: 'Error logging in', error });
     }
 });
 exports.login = login;
 const getCurrentUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('Getting current user details');
         // @ts-ignore
-        const userId = req.user.id;
-        console.log('User ID from token:', userId);
-        const user = yield User_1.default.findById(userId).select('-password');
+        const user = yield User_1.default.findById(req.user.id).select('-password');
         if (!user) {
-            console.log('User not found with ID:', userId);
             return res.status(404).json({ message: 'User not found' });
         }
-        console.log('Found user:', user._id);
         res.json(user);
     }
     catch (error) {
-        console.error('Error getting current user:', error);
-        if (error instanceof Error) {
-            res.status(500).json({ message: 'Error getting current user', error: error.message });
-        }
-        else {
-            res.status(500).json({ message: 'Error getting current user', error: 'Unknown error occurred' });
-        }
+        res.status(500).json({ message: 'Error fetching user', error });
     }
 });
 exports.getCurrentUser = getCurrentUser;

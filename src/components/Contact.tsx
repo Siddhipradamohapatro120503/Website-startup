@@ -32,12 +32,12 @@ const Contact: React.FC = () => {
     {
       icon: FiMail,
       title: 'Email',
-      content: 'contact@startup.com',
+      content: 'support@shreetech.org',
     },
     {
       icon: FiPhone,
       title: 'Phone',
-      content: '+1 (555) 123-4567',
+      content: '+91 8471045745 +91 6370066997',
     },
     {
       icon: FiMapPin,

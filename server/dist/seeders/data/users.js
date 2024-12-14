@@ -16,6 +16,24 @@ exports.usersData = [
         lastLogin: new Date()
     },
     {
+        email: 'hello@example.com',
+        password: bcryptjs_1.default.hashSync('admin123', 10),
+        firstName: 'Admin',
+        lastName: 'User',
+        role: 'admin',
+        isActive: true,
+        lastLogin: new Date()
+    },
+    {
+        email: 'abhay@example.com',
+        password: bcryptjs_1.default.hashSync('admin123', 10),
+        firstName: 'Abhay',
+        lastName: 'Admin',
+        role: 'admin',
+        isActive: true,
+        lastLogin: new Date()
+    },
+    {
         email: 'john.doe@example.com',
         password: bcryptjs_1.default.hashSync('user123', 10),
         firstName: 'John',

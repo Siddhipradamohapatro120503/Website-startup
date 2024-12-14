@@ -5,6 +5,9 @@ import { AuthProvider } from './hooks/useAuth';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
+import FreelancerLogin from './components/auth/FreelancerLogin';
+import FreelancerRegister from './components/auth/FreelancerRegister';
+import FreelancerDashboard from './components/freelancer/dashboard/FreelancerDashboard';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/admin/Dashboard';
 import UserDashboard from './components/user/UserDashboard';
@@ -40,6 +43,18 @@ function App() {
               <Route path="/services/:categoryId" element={<ServiceDetails />} />
               <Route path="/services/:categoryId/:serviceId" element={<ServiceDetailPage />} />
               
+              {/* Freelancer Routes */}
+              <Route path="/freelancer/login" element={<FreelancerLogin />} />
+              <Route path="/freelancer/register" element={<FreelancerRegister />} />
+              <Route
+                path="/freelancer/dashboard/*"
+                element={
+                  <ProtectedRoute requireFreelancer={true}>
+                    <FreelancerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* User Dashboard */}
               <Route
                 path="/dashboard/*"

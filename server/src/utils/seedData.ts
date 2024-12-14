@@ -1,6 +1,7 @@
 import User from '../models/User';
 import Service from '../models/Service';
 import mongoose from 'mongoose';
+import bcryptjs from 'bcryptjs';
 
 const initialServices = [
   {
@@ -46,27 +47,66 @@ const initialServices = [
 
 export const seedAdminUser = async () => {
   try {
-    // Check if admin user already exists
-    const adminExists = await User.findOne({ email: 'admin@example.com' });
-
-    if (!adminExists) {
-      // Create admin user
-      const adminUser = new User({
+    // List of admin users with their details
+    const adminUsers = [
+      {
         email: 'admin@example.com',
-        password: 'admin123', // This will be hashed by the User model pre-save hook
+        password: 'admin123',
         firstName: 'Admin',
-        lastName: 'User',
-        role: 'admin',
-        isActive: true,
-      });
+        lastName: 'Admin'
+      },
+      {
+        email: 'abhay@admin.com',
+        password: 'admin123',
+        firstName: 'Abhay',
+        lastName: 'Admin'
+      },
+      {
+        email: 'siddhi@admin.com',
+        password: 'Siddhi@2003',
+        firstName: 'siddhi',
+        lastName: 'Admin'
+      }
+    ];
+    
+    for (const adminData of adminUsers) {
+      const adminExists = await User.findOne({ email: adminData.email });
 
-      await adminUser.save();
-      console.log('Admin user created successfully');
-      console.log('Admin credentials:');
-      console.log('Email: admin@example.com');
-      console.log('Password: admin123');
-    } else {
-      console.log('Admin user already exists');
+      if (!adminExists) {
+        // Create admin user using the User model
+        const adminUser = new User({
+          ...adminData,
+          role: 'admin',
+          isActive: true,
+        });
+
+        // Save using the model to trigger the pre-save hook
+        await adminUser.save();
+        
+        console.log(`Admin user ${adminData.email} created successfully`);
+        console.log('Admin credentials:');
+        console.log(`Email: ${adminData.email}`);
+        console.log(`Password: ${adminData.password}`);
+      } else {
+        // If user exists but password might be wrong, update it
+        const salt = await bcryptjs.genSalt(10);
+        const hashedPassword = await bcryptjs.hash(adminData.password, salt);
+        
+        await User.findOneAndUpdate(
+          { email: adminData.email },
+          { 
+            $set: { 
+              password: hashedPassword,
+              role: 'admin',
+              isActive: true,
+              firstName: adminData.firstName,
+              lastName: adminData.lastName
+            }
+          }
+        );
+        
+        console.log(`Admin user ${adminData.email} updated`);
+      }
     }
   } catch (error) {
     console.error('Error seeding admin user:', error);

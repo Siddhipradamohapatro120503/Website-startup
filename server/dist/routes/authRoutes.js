@@ -7,4 +7,6 @@ const router = (0, express_1.Router)();
 router.post('/register', authController_1.register);
 router.post('/login', authController_1.login);
 router.get('/me', auth_1.auth, authController_1.getCurrentUser);
+router.post('/freelancer/register', authController_1.freelancerRegister);
+router.post('/freelancer/login', authController_1.freelancerLogin);
 exports.default = router;

@@ -15,3 +15,50 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.glow-text {
+  color: #00ff9d;
+  text-shadow: 0 0 10px #00ff9d,
+               0 0 20px #00ff9d,
+               0 0 30px #00ff9d,
+               0 0 40px #00ff9d;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+.hero-background {
+  background-color: rgba(0, 0, 0, 0.95);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(0, 255, 157, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.floating-numbers {
+  position: absolute;
+  color: rgba(0, 255, 157, 0.1);
+  font-size: 24px;
+  user-select: none;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px #00ff9d,
+                 0 0 20px #00ff9d,
+                 0 0 30px #00ff9d;
+  }
+  to {
+    text-shadow: 0 0 20px #00ff9d,
+                 0 0 30px #00ff9d,
+                 0 0 40px #00ff9d,
+                 0 0 50px #00ff9d;
+  }
+}

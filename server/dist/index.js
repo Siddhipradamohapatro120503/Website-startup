@@ -24,7 +24,7 @@ const serviceRoutes_1 = __importDefault(require("./routes/serviceRoutes"));
 const registeredServiceRoutes_1 = __importDefault(require("./routes/registeredServiceRoutes"));
 const messageRoutes_1 = __importDefault(require("./routes/messageRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
-const freelancer_routes_1 = __importDefault(require("./routes/freelancer.routes"));
+const freelancerRoutes_1 = __importDefault(require("./routes/freelancerRoutes"));
 const seedData_1 = require("./utils/seedData");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -47,7 +47,7 @@ app.use('/api/messages', messageRoutes_1.default);
 app.use('/api/reports', reportRoutes_1.default);
 app.use('/api/integrations', integrationRoutes_1.default);
 app.use('/api/users', userRoutes_1.default);
-app.use('/api/freelancers', freelancer_routes_1.default);
+app.use('/api/freelancers', freelancerRoutes_1.default);
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/startup-platform';
 const PORT = process.env.PORT || 5000;

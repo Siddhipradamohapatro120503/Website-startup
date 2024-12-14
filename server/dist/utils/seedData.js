@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.initializeDatabase = exports.seedServices = exports.seedAdminUser = void 0;
 const User_1 = __importDefault(require("../models/User"));
 const Service_1 = __importDefault(require("../models/Service"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const initialServices = [
     {
         name: 'Business Consulting',
@@ -58,26 +59,40 @@ const initialServices = [
 ];
 const seedAdminUser = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Check if admin user already exists
-        const adminExists = yield User_1.default.findOne({ email: 'admin@example.com' });
-        if (!adminExists) {
-            // Create admin user
-            const adminUser = new User_1.default({
-                email: 'admin@example.com',
-                password: 'admin123', // This will be hashed by the User model pre-save hook
-                firstName: 'Admin',
-                lastName: 'User',
-                role: 'admin',
-                isActive: true,
-            });
-            yield adminUser.save();
-            console.log('Admin user created successfully');
-            console.log('Admin credentials:');
-            console.log('Email: admin@example.com');
-            console.log('Password: admin123');
-        }
-        else {
-            console.log('Admin user already exists');
+        // Check if admin users already exist
+        const adminEmails = ['admin@example.com', 'abhay@example.com'];
+        for (const email of adminEmails) {
+            const adminExists = yield User_1.default.findOne({ email });
+            if (!adminExists) {
+                // Create admin user using the User model
+                const adminUser = new User_1.default({
+                    email,
+                    password: 'admin123', // Will be hashed by the pre-save hook
+                    firstName: email === 'abhay@example.com' ? 'Abhay' : 'Admin',
+                    lastName: 'Admin',
+                    role: 'admin',
+                    isActive: true,
+                });
+                // Save using the model to trigger the pre-save hook
+                yield adminUser.save();
+                console.log(`Admin user ${email} created successfully`);
+                console.log('Admin credentials:');
+                console.log(`Email: ${email}`);
+                console.log('Password: admin123');
+            }
+            else {
+                // If user exists but password might be wrong, update it
+                const salt = yield bcryptjs_1.default.genSalt(10);
+                const hashedPassword = yield bcryptjs_1.default.hash('admin123', salt);
+                yield User_1.default.findOneAndUpdate({ email }, {
+                    $set: {
+                        password: hashedPassword,
+                        role: 'admin',
+                        isActive: true
+                    }
+                });
+                console.log(`Admin user ${email} password updated`);
+            }
         }
     }
     catch (error) {

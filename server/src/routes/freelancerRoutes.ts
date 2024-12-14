@@ -1,27 +1,28 @@
-import express from 'express';
+import { Router } from 'express';
 import {
   getAllFreelancers,
   getFreelancerById,
   createFreelancer,
   updateFreelancer,
-  deleteFreelancer
+  deleteFreelancer,
+  updateFreelancerProfile,
+  getFreelancerProfile
 } from '../controllers/freelancer.controller';
+import { auth } from '../middleware/auth';
 
-const router = express.Router();
+const router = Router();
 
-// Get all freelancers
+// Public routes
 router.get('/', getAllFreelancers);
-
-// Get a single freelancer
 router.get('/:id', getFreelancerById);
 
-// Create a new freelancer
-router.post('/', createFreelancer);
+// Protected routes
+router.post('/', auth, createFreelancer);
+router.put('/:id', auth, updateFreelancer);
+router.delete('/:id', auth, deleteFreelancer);
 
-// Update a freelancer
-router.put('/:id', updateFreelancer);
-
-// Delete a freelancer
-router.delete('/:id', deleteFreelancer);
+// Profile routes
+router.get('/profile/me', auth, getFreelancerProfile);
+router.put('/profile/me', auth, updateFreelancerProfile);
 
 export default router;

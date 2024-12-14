@@ -5,13 +5,15 @@ import { useAuth } from '../../hooks/useAuth';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  requireFreelancer?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requireAdmin = false 
+  requireAdmin = false,
+  requireFreelancer = false
 }) => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, isFreelancer } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
@@ -20,8 +22,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requireAdmin && !isAdmin) {
-    // Redirect to dashboard if user is not admin but tries to access admin routes
+    // Redirect to dashboard if user is not admin
     return <Navigate to="/dashboard" replace />;
+  }
+
+  if (requireFreelancer && !isFreelancer) {
+    // Redirect to dashboard if user is not a freelancer
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

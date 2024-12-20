@@ -1,0 +1,283 @@
+import {
+  FiCpu,
+  FiCamera,
+  FiCode,
+  FiLayout,
+  FiMessageSquare,
+  FiTrendingUp,
+  FiBarChart2,
+  FiSettings,
+  FiCloud,
+  FiServer,
+  FiPenTool,
+  FiGrid,
+  FiUsers,
+} from 'react-icons/fi';
+import { ServiceCategory } from '../types/service';
+
+export const serviceCategories: ServiceCategory[] = [
+  {
+    title: 'AI & Machine Learning',
+    icon: FiCpu,
+    services: [
+      {
+        name: 'Custom AI Solutions',
+        icon: FiCpu,
+        description: 'Custom AI Model Development and Integration',
+        features: ['Model Development', 'Integration', 'Training', 'Deployment'],
+        technologies: ['TensorFlow', 'PyTorch', 'Keras', 'Scikit-learn'],
+        useCases: ['Predictive Maintenance', 'Image Classification', 'Natural Language Processing', 'Recommendation Systems'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/custom-ai-solutions.pdf',
+      },
+      {
+        name: 'Computer Vision',
+        icon: FiCamera,
+        description: 'Image Recognition & Classification Solutions',
+        features: ['Object Detection', 'Image Recognition', 'Video Analysis', 'Pattern Recognition'],
+        technologies: ['OpenCV', 'TensorFlow', 'PyTorch', 'Keras'],
+        useCases: ['Image Classification', 'Object Detection', 'Facial Recognition', 'Image Segmentation'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/computer-vision.pdf',
+      },
+      {
+        name: 'Natural Language Processing',
+        icon: FiMessageSquare,
+        description: 'Text Classification & Analysis',
+        features: ['Text Analysis', 'Sentiment Analysis', 'Language Translation', 'Named Entity Recognition'],
+        technologies: ['NLTK', 'spaCy', 'TensorFlow', 'PyTorch'],
+        useCases: ['Text Classification', 'Sentiment Analysis', 'Language Translation', 'Named Entity Recognition'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/natural-language-processing.pdf',
+      },
+      {
+        name: 'Predictive Analytics',
+        icon: FiBarChart2,
+        description: 'Time Series Analysis and Forecasting',
+        features: ['Time Series Analysis', 'Forecasting', 'Pattern Detection', 'Anomaly Detection'],
+        technologies: ['ARIMA', 'Prophet', 'LSTM', 'GRU'],
+        useCases: ['Time Series Forecasting', 'Anomaly Detection', 'Pattern Recognition', 'Predictive Maintenance'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/predictive-analytics.pdf',
+      },
+    ],
+  },
+  {
+    title: 'Content Creation',
+    icon: FiCamera,
+    services: [
+      {
+        name: 'Video Editing',
+        icon: FiCamera,
+        description: 'Short-form Content Creation and Editing',
+        features: ['Video Editing', 'Motion Graphics', 'Color Grading', 'Sound Design'],
+        technologies: ['Adobe Premiere Pro', 'Final Cut Pro', 'Avid Media Composer', 'DaVinci Resolve'],
+        useCases: ['Social Media Videos', 'Event Videos', 'Product Videos', 'Explainer Videos'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/video-editing.pdf',
+      },
+      {
+        name: 'Graphic Design',
+        icon: FiPenTool,
+        description: 'Branding and Visual Identity Design',
+        features: ['Logo Design', 'Brand Guidelines', 'Marketing Materials', 'Social Media Graphics'],
+        technologies: ['Adobe Creative Cloud', 'Sketch', 'Figma', 'InVision'],
+        useCases: ['Logo Design', 'Brand Identity', 'Marketing Materials', 'Social Media Graphics'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/graphic-design.pdf',
+      },
+    ],
+  },
+  {
+    title: 'Digital Marketing',
+    icon: FiTrendingUp,
+    services: [
+      {
+        name: 'Social Media Management',
+        icon: FiUsers,
+        description: 'Content Planning and Strategy',
+        features: ['Content Strategy', 'Community Management', 'Analytics', 'Campaign Planning'],
+        technologies: ['Hootsuite', 'Sprout Social', 'Buffer', 'SocialPilot'],
+        useCases: ['Social Media Management', 'Content Creation', 'Community Engagement', 'Influencer Marketing'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/social-media-management.pdf',
+      },
+      {
+        name: 'Social Media Marketing',
+        icon: FiBarChart2,
+        description: 'Strategic social media marketing solutions',
+        features: [
+          'Platform Setup',
+          'Campaign Management',
+          'Budget Optimization',
+          'Performance Tracking',
+          'Competitor Analysis',
+        ],
+        technologies: ['Facebook Ads', 'Google Ads', 'LinkedIn Ads', 'Twitter Ads'],
+        useCases: ['Lead Generation', 'Brand Awareness', 'Product Launch', 'Event Promotion'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/social-media-marketing.pdf',
+      },
+    ],
+  },
+  {
+    title: 'Development',
+    icon: FiCode,
+    services: [
+      {
+        name: 'Web Development',
+        icon: FiCode,
+        description: 'Responsive Design and Development',
+        features: ['Frontend Development', 'Backend Development', 'API Integration', 'Database Design'],
+        technologies: ['HTML/CSS', 'JavaScript', 'React', 'Angular', 'Vue.js'],
+        useCases: ['Web Application Development', 'E-commerce Solutions', 'Responsive Design', 'API Integration'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/web-development.pdf',
+      },
+      {
+        name: 'Web App Design',
+        icon: FiLayout,
+        description: 'UI Design and Implementation',
+        features: ['UI Design', 'Prototyping', 'Responsive Design', 'User Testing'],
+        technologies: ['Sketch', 'Figma', 'InVision', 'Adobe XD'],
+        useCases: ['Web Application Design', 'Mobile App Design', 'Responsive Design', 'User Experience'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/web-app-design.pdf',
+      },
+      {
+        name: 'UI/UX Design',
+        icon: FiGrid,
+        description: 'Create intuitive and engaging user experiences through research-driven design processes and modern UI implementations',
+        features: [
+          'User Research & Analysis',
+          'Information Architecture',
+          'Wireframing & Prototyping',
+          'Interaction Design',
+          'Visual Design Systems',
+          'Usability Testing',
+          'Accessibility Implementation',
+          'Mobile-First Design'
+        ],
+        technologies: [
+          'Figma',
+          'Adobe XD',
+          'Sketch',
+          'InVision',
+          'Principle',
+          'Maze',
+          'Zeplin',
+          'Abstract'
+        ],
+        useCases: [
+          'E-commerce Platform Redesign',
+          'Mobile App User Experience',
+          'SaaS Dashboard Design',
+          'Design System Creation',
+          'User Flow Optimization',
+          'Cross-Platform Experience Design'
+        ],
+        whyChooseUs: [
+          'User-Centered Design Approach',
+          'Research-Driven Solutions',
+          'Industry Best Practices',
+          'Cross-Platform Expertise',
+          'Iterative Design Process',
+          'Accessibility Focused'
+        ],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'design@yourcompany.com'
+        },
+        brochureUrl: '/brochures/ui-ux-design.pdf'
+      },
+    ],
+  },
+  {
+    title: 'Technical Solutions',
+    icon: FiSettings,
+    services: [
+      {
+        name: 'Infrastructure Setup',
+        icon: FiServer,
+        description: 'Network Design and Implementation',
+        features: ['Network Architecture', 'Security Setup', 'Performance Optimization', 'Monitoring'],
+        technologies: ['AWS', 'Azure', 'GCP', 'VMware'],
+        useCases: ['Cloud Infrastructure', 'On-premises Infrastructure', 'Hybrid Infrastructure', 'Disaster Recovery'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/infrastructure-setup.pdf',
+      },
+      {
+        name: 'Cloud Solutions',
+        icon: FiCloud,
+        description: 'AWS/Azure/GCP Implementation',
+        features: ['Cloud Migration', 'Architecture Design', 'Cost Optimization', 'Security'],
+        technologies: ['AWS', 'Azure', 'GCP', 'Kubernetes'],
+        useCases: ['Cloud Migration', 'Cloud Native Applications', 'Hybrid Cloud', 'Cloud Security'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/cloud-solutions.pdf',
+      },
+      {
+        name: 'DevOps Solutions',
+        icon: FiSettings,
+        description: 'CI/CD Pipeline Implementation',
+        features: ['Pipeline Setup', 'Automation', 'Monitoring', 'Security Integration'],
+        technologies: ['Jenkins', 'GitLab CI/CD', 'CircleCI', 'Travis CI'],
+        useCases: ['Continuous Integration', 'Continuous Deployment', 'Continuous Monitoring', 'Continuous Security'],
+        whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
+        contactInfo: {
+          phone: '+1 (234) 567-8900',
+          email: 'support@yourcompany.com',
+        },
+        brochureUrl: '/brochures/devops-solutions.pdf',
+      },
+    ],
+  },
+];

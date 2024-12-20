@@ -1,4 +1,4 @@
-import { serviceCategories } from '../components/LandingPage';
+import { serviceCategories } from '../data/services';
 
 interface ServiceData {
   name: string;

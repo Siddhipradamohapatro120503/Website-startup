@@ -44,7 +44,19 @@ import {
 import { FiCheck, FiClock, FiStar, FiCalendar, FiInfo, FiCpu, FiCamera, FiMessageSquare, FiTrendingUp, FiFilm, FiPenTool, FiShare2, FiBarChart2, FiGlobe, FiLayout, FiGrid, FiCloud, FiServer } from 'react-icons/fi';
 import type { IconType } from 'react-icons';
 import { useServices } from '../../context/ServicesContext';
-import { serviceCategories } from '../LandingPage';
+import { serviceCategories } from '../../data/services';
+
+interface ServiceCategory {
+  title: string;
+  services: {
+    name: string;
+    description?: string;
+    icon: IconType;
+    features: string[];
+    technologies?: string[];
+    useCases?: string[];
+  }[];
+}
 
 interface Service {
   id: string;
@@ -59,17 +71,17 @@ interface Service {
 }
 
 // Convert serviceCategories to our Service interface format
-const allServices: Service[] = serviceCategories.flatMap((category) =>
+const allServices: Service[] = serviceCategories.flatMap((category: ServiceCategory) =>
   category.services.map((service, index) => ({
     id: `${category.title.toLowerCase()}-${index + 1}`,
     name: service.name,
     description: service.description || '',
-    duration: ['1 month', '2 months', '3 months', '6 months'][Math.floor(Math.random() * 4)], // Random duration
+    duration: ['1 month', '2 months', '3 months', '6 months'][Math.floor(Math.random() * 4)],
     category: category.title,
-    features: service.features,
+    features: service.features || [],
     technologies: service.technologies,
     useCases: service.useCases,
-    icon: service.icon,
+    icon: service.icon || FiStar
   }))
 );
 
@@ -118,6 +130,7 @@ const ServicesList: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
+
       ...prev,
       [name]: value
     }));

@@ -5,10 +5,10 @@ import {
   Container,
   Heading,
   Text,
-  Grid,
-  Icon,
   Button,
+  Grid,
   Stack,
+  Icon,
   useColorModeValue,
   Breadcrumb,
   BreadcrumbItem,
@@ -16,14 +16,15 @@ import {
 } from '@chakra-ui/react';
 import { FiArrowLeft, FiCheck } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import { serviceCategories } from './LandingPage';
+import { serviceCategories } from '../data/services';
+import { Service, ServiceCategory } from '../types/service';
 
 const ServiceDetails: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
   
   const category = serviceCategories.find(
-    cat => cat.title.toLowerCase().replace(/\s+/g, '-') === categoryId
+    (cat: ServiceCategory) => cat.title.toLowerCase().replace(/\s+/g, '-') === categoryId
   );
 
   const bgColor = useColorModeValue('white', 'gray.900');
@@ -67,7 +68,7 @@ const ServiceDetails: React.FC = () => {
           </Heading>
 
           <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={8}>
-            {category.services.map((service, index) => (
+            {category.services.map((service: Service, index: number) => (
               <motion.div
                 key={service.name}
                 initial={{ opacity: 0, y: 20 }}
@@ -87,7 +88,7 @@ const ServiceDetails: React.FC = () => {
                     {service.name}
                   </Heading>
                   <Stack spacing={4}>
-                    {service.features.map((feature) => (
+                    {service.features.map((feature: string) => (
                       <Stack key={feature} direction="row" align="center">
                         <Icon as={FiCheck} color="green.500" />
                         <Text color={textColor}>{feature}</Text>

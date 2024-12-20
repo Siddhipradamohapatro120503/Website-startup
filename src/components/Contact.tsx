@@ -34,11 +34,11 @@ const Contact: React.FC = () => {
       title: 'Email',
       content: 'support@shreetech.org',
     },
-    {
-      icon: FiPhone,
-      title: 'Phone',
-      content: '+91 8471045745 +91 6370066997',
-    },
+    // {
+    //   icon: FiPhone,
+    //   title: 'Phone',
+    //   content: '+91 8471045745 +91 6370066997',
+    // },
     {
       icon: FiMapPin,
       title: 'Address',

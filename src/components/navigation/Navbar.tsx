@@ -98,8 +98,8 @@ export default function Navbar() {
                 width="250px"
                 objectFit="cover"
                 borderRadius="full"
-                mt="-80px"
-                mb="-80px"
+                mt="-90px"
+                mb="-90px"
                 filter={useColorModeValue('brightness(1)', 'brightness(1.2)')}
                 transition="all 0.2s"
               />

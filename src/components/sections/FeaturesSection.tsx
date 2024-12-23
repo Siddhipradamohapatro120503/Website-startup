@@ -1,31 +1,33 @@
 import React from 'react';
-import { Box, Container, Heading, Text, Grid, Icon, Button, useColorModeValue } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, Grid, Icon, Button, useColorModeValue, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FiLayout, FiCode, FiLayers, FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+
+interface FeaturesSectionProps {
+  images?: string[];
+}
 
 const features = [
   {
     title: 'Responsive Design',
     description: 'Optimized for all devices',
-    icon: FiLayout,
   },
   {
     title: 'Performance',
     description: 'Lightning-fast load times',
-    icon: FiCode,
   },
   {
     title: 'Security',
     description: 'Enterprise-grade protection',
-    icon: FiLayers,
   },
 ];
 
-const FeaturesSection: React.FC = () => {
+const FeaturesSection: React.FC<FeaturesSectionProps> = ({ images }) => {
   const navigate = useNavigate();
-  const cardBgColor = useColorModeValue('white', 'gray.800');
-  const cardBorderColor = useColorModeValue('gray.200', 'gray.700');
+  const bgColor = useColorModeValue('gray.50', 'gray.800');
+  const cardBg = useColorModeValue('white', 'gray.700');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
   const textColor = useColorModeValue('gray.600', 'gray.300');
 
   return (
@@ -51,9 +53,9 @@ const FeaturesSection: React.FC = () => {
               <Box
                 p={8}
                 borderRadius="xl"
-                bg={cardBgColor}
+                bg={cardBg}
                 borderWidth={1}
-                borderColor={cardBorderColor}
+                borderColor={borderColor}
                 _hover={{
                   transform: 'translateY(-8px)',
                   boxShadow: 'xl',
@@ -61,7 +63,16 @@ const FeaturesSection: React.FC = () => {
                 }}
                 transition="all 0.3s ease"
               >
-                <Icon as={feature.icon} w={8} h={8} mb={4} color="blue.400" />
+                {images && (
+                  <Image
+                    src={images[index]}
+                    w={8}
+                    h={8}
+                    mb={4}
+                    borderRadius="full"
+                    objectFit="cover"
+                  />
+                )}
                 <Heading size="md" mb={4}>
                   {feature.title}
                 </Heading>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Heading, Text, Grid, Icon, Stack, Flex, useColorModeValue } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, Grid, Icon, Stack, Flex, useColorModeValue, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -7,13 +7,15 @@ import { ServiceCategory } from '../../types/service';
 
 interface ServicesSectionProps {
   serviceCategories: ServiceCategory[];
+  images?: string[];
 }
 
-const ServicesSection: React.FC<ServicesSectionProps> = ({ serviceCategories }) => {
+const ServicesSection: React.FC<ServicesSectionProps> = ({ serviceCategories, images }) => {
   const navigate = useNavigate();
   const textColor = useColorModeValue('gray.600', 'gray.300');
-  const cardBgColor = useColorModeValue('white', 'gray.800');
-  const cardBorderColor = useColorModeValue('gray.200', 'gray.700');
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const cardBg = useColorModeValue('white', 'gray.700');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
   const highlightColor = useColorModeValue('blue.500', 'blue.300');
   const hoverBgColor = useColorModeValue('gray.50', 'gray.700');
 
@@ -53,11 +55,11 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ serviceCategories }) 
               style={{ cursor: 'pointer' }}
             >
               <Box
-                bg={cardBgColor}
+                bg={cardBg}
                 p={8}
                 borderRadius="xl"
                 borderWidth={1}
-                borderColor={cardBorderColor}
+                borderColor={borderColor}
                 height="100%"
                 _hover={{
                   transform: 'translateY(-4px)',
@@ -85,7 +87,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ serviceCategories }) 
                       p={4}
                       borderRadius="md"
                       borderWidth={1}
-                      borderColor={cardBorderColor}
+                      borderColor={borderColor}
                       _hover={{
                         bg: hoverBgColor,
                         transform: 'translateX(4px)',

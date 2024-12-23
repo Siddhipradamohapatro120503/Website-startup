@@ -1,99 +1,109 @@
 import React from 'react';
 import { Box, Container, Flex, Heading, Text, Stack, Button, Icon, useColorModeValue } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FiArrowRight, FiDownload } from 'react-icons/fi';
-import HeroCarousel from '../carousel/HeroCarousel';
-import { carouselItems } from '../../data/heroCarousel';
+import { FiArrowRight } from 'react-icons/fi';
+import HeroCarousel from './HeroCarousel';
 import BrandsMarquee from './BrandsMarquee';
-import PathwaySection from './PathwaySection';
 import StatsSection from './StatsSection';
 import CaseStudiesSection from './CaseStudiesSection';
 import TrustIndicatorsSection from './TrustIndicatorsSection';
+import WorkflowSection from './WorkflowSection';
 
-const HeroSection: React.FC<{ onExploreClick: () => void }> = ({ onExploreClick }) => {
+interface HeroSectionProps {
+  onExploreClick: () => void;
+  images: string[];
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => {
   const textColor = useColorModeValue('gray.600', 'gray.300');
+  const overlayBg = useColorModeValue(
+    'linear-gradient(to right, white 0%, whiteAlpha.800 50%, whiteAlpha.500 75%, transparent 100%)',
+    'linear-gradient(to right, gray.900 0%, blackAlpha.800 50%, blackAlpha.500 75%, transparent 100%)'
+  );
 
   return (
     <>
-      <Box id="hero" bgGradient={useColorModeValue(
-        'linear(to-br, blue.50, purple.50)',
-        'linear(to-br, gray.900, purple.900)'
-      )}>
-        <Container maxW="container.xl">
-          <Flex
-            align="center"
-            justify="space-between"
-            wrap="wrap"
-            minH="100vh"
-            pt={{ base: 20, md: 28 }}
-            pb={20}
-            gap={8}
-          >
-            <Box flex={1} pr={{ base: 0, md: 20 }} mb={{ base: 10, md: 0 }}>
+      <Box id="hero" position="relative" height="90vh" overflow="hidden">
+        {/* Carousel Background */}
+        <HeroCarousel images={images} autoPlayInterval={6000} />
+
+        {/* Content Overlay */}
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bgGradient={overlayBg}
+          zIndex={1}
+        >
+          <Container maxW="container.xl" height="100%">
+            <Flex
+              direction="column"
+              justify="center"
+              height="100%"
+              maxW={{ base: "100%", md: "60%" }}
+              position="relative"
+              zIndex={2}
+            >
               <motion.div
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="float-animation"
               >
-                <Heading
-                  as="h1"
-                  fontSize={{ base: '4xl', md: '5xl', lg: '6xl' }}
-                  mb={6}
-                  fontWeight="bold"
-                  lineHeight="shorter"
-                >
-                  Transform Your{' '}
-                  <Text
-                    as="span"
-                    bgGradient="linear(to-r, blue.400, purple.500)"
-                    bgClip="text"
+                <Stack spacing={6}>
+                  <Heading
+                    as="h1"
+                    size="2xl"
+                    fontWeight="bold"
+                    lineHeight="shorter"
                   >
-                    Digital Presence
+                    <Text
+                      as="span"
+                      bgGradient="linear(to-r, blue.400, purple.500, pink.400)"
+                      bgClip="text"
+                      fontSize={{ base: "4xl", md: "5xl", lg: "6xl" }}
+                    >
+                      Transform Your Business
+                    </Text>{" "}
+                    <Text
+                      as="span"
+                      bgGradient="linear(to-l, cyan.400, blue.500, purple.600)"
+                      bgClip="text"
+                      fontSize={{ base: "4xl", md: "5xl", lg: "6xl" }}
+                    >
+                      with Our Tech Solutions
+                    </Text>
+                  </Heading>
+                  <Text fontSize="xl" color={textColor}>
+                    Unlock the power of innovation with our cutting-edge technology services. 
+                    We help businesses scale, innovate, and thrive in the digital age.
                   </Text>
-                </Heading>
-                <Text fontSize={{ base: 'lg', md: 'xl' }} mb={8} color={textColor}>
-                  Elevate your business with our comprehensive digital solutions
-                </Text>
-                <Stack direction={{ base: 'column', sm: 'row' }} spacing={4}>
-                  <Button
-                    size="lg"
-                    colorScheme="blue"
-                    px={8}
-                    onClick={onExploreClick}
-                    rightIcon={<Icon as={FiArrowRight} />}
-                  >
-                    Explore Services
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    px={8}
-                    rightIcon={<Icon as={FiDownload} />}
-                  >
-                    Download Brochure
-                  </Button>
+                  <Stack direction="row" spacing={4}>
+                    <Button
+                      size="lg"
+                      colorScheme="blue"
+                      rightIcon={<Icon as={FiArrowRight} />}
+                      onClick={onExploreClick}
+                      _hover={{
+                        transform: 'translateY(-2px)',
+                        boxShadow: 'lg',
+                      }}
+                    >
+                      Explore Services
+                    </Button>
+                  </Stack>
                 </Stack>
               </motion.div>
-            </Box>
-
-            <Box flex={1} w={{ base: "100%", md: "50%" }}>
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                <HeroCarousel items={carouselItems} />
-              </motion.div>
-            </Box>
-          </Flex>
-        </Container>
+            </Flex>
+          </Container>
+        </Box>
       </Box>
       <BrandsMarquee />
+      <WorkflowSection />
       <StatsSection />
       <TrustIndicatorsSection />
-      <CaseStudiesSection />
-      <PathwaySection />
+      {/* <CaseStudiesSection /> */}
     </>
   );
 };

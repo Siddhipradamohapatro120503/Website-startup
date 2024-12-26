@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Container, Flex, Heading, Text, Stack, Button, Icon, useColorModeValue } from '@chakra-ui/react';
+import { Box, Container, Flex, Heading, Text, Stack, Button, Icon, useColorModeValue, IconButton, HStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
+import { FaTwitter, FaLinkedin, FaInstagram, FaFacebook } from 'react-icons/fa';
 import HeroCarousel from './HeroCarousel';
 import BrandsMarquee from './BrandsMarquee';
 import StatsSection from './StatsSection';
@@ -79,6 +80,48 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => 
                     Unlock the power of innovation with our cutting-edge technology services. 
                     We help businesses scale, innovate, and thrive in the digital age.
                   </Text>
+                  <HStack spacing={4} pt={2}>
+                    <IconButton
+                      as="a"
+                      href="https://twitter.com/youraccount"
+                      aria-label="Twitter"
+                      icon={<FaTwitter />}
+                      size="md"
+                      colorScheme="twitter"
+                      variant="ghost"
+                      _hover={{ bg: 'twitter.100' }}
+                    />
+                    <IconButton
+                      as="a"
+                      href="https://linkedin.com/company/youraccount"
+                      aria-label="LinkedIn"
+                      icon={<FaLinkedin />}
+                      size="md"
+                      colorScheme="linkedin"
+                      variant="ghost"
+                      _hover={{ bg: 'linkedin.100' }}
+                    />
+                    <IconButton
+                      as="a"
+                      href="https://instagram.com/youraccount"
+                      aria-label="Instagram"
+                      icon={<FaInstagram />}
+                      size="md"
+                      colorScheme="pink"
+                      variant="ghost"
+                      _hover={{ bg: 'pink.100' }}
+                    />
+                    <IconButton
+                      as="a"
+                      href="https://facebook.com/youraccount"
+                      aria-label="Facebook"
+                      icon={<FaFacebook />}
+                      size="md"
+                      colorScheme="facebook"
+                      variant="ghost"
+                      _hover={{ bg: 'facebook.100' }}
+                    />
+                  </HStack>
                   <Stack direction="row" spacing={4}>
                     <Button
                       size="lg"

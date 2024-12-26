@@ -53,11 +53,11 @@ const Footer: React.FC = () => {
                 cursor="pointer"
                 onClick={() => navigate('/')}
               >
-                Startup
+                Shreetech
               </Heading>
             </Box>
             <Text fontSize={'sm'}>
-              © {new Date().getFullYear()} Startup. All rights reserved
+              {new Date().getFullYear()} Shreetech. All rights reserved
             </Text>
             <HStack spacing={6}>
               <IconButton
@@ -181,7 +181,7 @@ const Footer: React.FC = () => {
           pt={6}
           fontSize="sm"
         >
-          <Text>Made with ❤️ by the Startup Team</Text>
+          <Text>Made with ❤️ by the Shreetech Team</Text>
           <HStack spacing={4} mt={{ base: 4, md: 0 }}>
             <Text as="a" href="#" _hover={{ color: 'blue.400' }}>
               Terms

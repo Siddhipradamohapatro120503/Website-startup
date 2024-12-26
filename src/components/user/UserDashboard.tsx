@@ -14,11 +14,17 @@ import {
   StatNumber,
   StatHelpText,
   Button,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
 } from '@chakra-ui/react';
-import { FiActivity, FiClock, FiCheckCircle, FiList } from 'react-icons/fi';
+import { FiActivity, FiClock, FiCheckCircle, FiList, FiDollarSign } from 'react-icons/fi';
 import ServicesList from './ServicesList';
 import UserProfile from './UserProfile';
 import RegisteredServices from './RegisteredServices';
+import PaymentSection from './sections/PaymentSection';
 import { ServicesProvider } from '../../context/ServicesContext';
 
 const UserDashboard: React.FC = () => {
@@ -51,64 +57,68 @@ const UserDashboard: React.FC = () => {
               borderColor={borderColor}
             >
               <VStack spacing={4} align="stretch">
-                <HStack justify="space-between">
-                  <Heading size="md">Overview</Heading>
-                  <Button
-                    size="sm"
-                    colorScheme="blue"
-                    leftIcon={<Icon as={FiList} />}
-                    onClick={scrollToRegisteredServices}
-                  >
-                    View Registered Services
-                  </Button>
-                </HStack>
-                <Grid templateColumns="repeat(1, 1fr)" gap={4}>
+                <Heading size="md">Overview</Heading>
+                <Grid templateColumns="1fr 1fr" gap={4}>
                   <Stat>
                     <StatLabel>Active Services</StatLabel>
-                    <HStack>
-                      <Icon as={FiCheckCircle} color="green.500" />
-                      <StatNumber>3</StatNumber>
-                    </HStack>
-                    <StatHelpText>Currently enrolled</StatHelpText>
+                    <StatNumber>3</StatNumber>
+                    <StatHelpText>
+                      <HStack>
+                        <Icon as={FiActivity} />
+                        <Text>Currently Active</Text>
+                      </HStack>
+                    </StatHelpText>
                   </Stat>
                   <Stat>
-                    <StatLabel>Hours Used</StatLabel>
-                    <HStack>
-                      <Icon as={FiClock} color="blue.500" />
-                      <StatNumber>24</StatNumber>
-                    </HStack>
-                    <StatHelpText>This month</StatHelpText>
-                  </Stat>
-                  <Stat>
-                    <StatLabel>Activity Score</StatLabel>
-                    <HStack>
-                      <Icon as={FiActivity} color="purple.500" />
-                      <StatNumber>85%</StatNumber>
-                    </HStack>
-                    <StatHelpText>Good standing</StatHelpText>
+                    <StatLabel>Pending</StatLabel>
+                    <StatNumber>2</StatNumber>
+                    <StatHelpText>
+                      <HStack>
+                        <Icon as={FiClock} />
+                        <Text>Awaiting Action</Text>
+                      </HStack>
+                    </StatHelpText>
                   </Stat>
                 </Grid>
               </VStack>
             </Box>
           </VStack>
 
-          {/* Right Column - Services */}
-          <VStack spacing={8} align="stretch">
-            {/* Registered Services */}
-            <Box ref={registeredServicesRef}>
-              <Heading size="md" mb={4}>Your Registered Services</Heading>
-              <RegisteredServices />
-            </Box>
+          {/* Right Column - Services and Payments */}
+          <Box>
+            <Tabs variant="enclosed">
+              <TabList>
+                <Tab>
+                  <HStack>
+                    <Icon as={FiList} />
+                    <Text>Services</Text>
+                  </HStack>
+                </Tab>
+                <Tab>
+                  <HStack>
+                    <Icon as={FiDollarSign} />
+                    <Text>Payments</Text>
+                  </HStack>
+                </Tab>
+              </TabList>
 
-            {/* Available Services */}
-            <Box>
-              <Heading size="md" mb={4}>Available Services</Heading>
-              <Text color="gray.600" mb={4}>
-                Discover and register for new services that match your needs
-              </Text>
-              <ServicesList />
-            </Box>
-          </VStack>
+              <TabPanels>
+                <TabPanel>
+                  <VStack spacing={8} align="stretch">
+                    <Box ref={registeredServicesRef}>
+                      <RegisteredServices />
+                    </Box>
+                    <Box>
+                      <ServicesList />
+                    </Box>
+                  </VStack>
+                </TabPanel>
+                <TabPanel>
+                  <PaymentSection />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Box>
         </Grid>
       </Container>
     </ServicesProvider>

@@ -6,6 +6,7 @@ import Footer from './common/Footer';
 import HeroSection from './sections/HeroSection';
 import ServicesSection from './sections/ServicesSection';
 import FeaturesSection from './sections/FeaturesSection';
+// import PriceCalculator from './sections/PriceCalculator';
 import TestimonialsSection from './sections/TestimonialsSection';
 import ContactSection from './sections/ContactSection';
 import ScrollIndicator from './sections/ScrollIndicator';
@@ -154,6 +155,7 @@ const LandingPage: React.FC = () => {
       { id: 'hero', label: 'Home' },
       { id: 'services', label: 'Services' },
       { id: 'features', label: 'Features' },
+      { id: 'price-calculator', label: 'Price Calculator' },
       { id: 'testimonials', label: 'Testimonials' },
       { id: 'contactus', label: 'Contact Us' },
     ],
@@ -227,6 +229,8 @@ const LandingPage: React.FC = () => {
         <FeaturesSection 
           images={techImages.features}
         />
+        
+        {/* <PriceCalculator /> */}
         
         <TestimonialsSection testimonials={testimonials} />
         <ContactSection onDemoClick={onOpen} />

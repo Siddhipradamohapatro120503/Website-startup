@@ -24,6 +24,7 @@ import {
   FiBox,
   FiPieChart,
   FiGrid,
+  FiDollarSign,
 } from 'react-icons/fi';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
@@ -105,6 +106,9 @@ const SidebarContent = ({ ...rest }) => {
         </NavItem>
         <NavItem icon={FiGrid} path="/admin/registered-services">
           Registered Services
+        </NavItem>
+        <NavItem icon={FiDollarSign} path="/admin/payments">
+          Payments
         </NavItem>
         <NavItem icon={FiBriefcase} path="/admin/freelancers">
           Freelancers

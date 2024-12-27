@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Text,
+  VStack,
+  Heading,
   Table,
   Thead,
   Tbody,
@@ -9,27 +10,36 @@ import {
   Th,
   Td,
   Button,
-  Badge,
-  useToast,
+  useDisclosure,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   ModalCloseButton,
-  useDisclosure,
-  VStack,
+  Text,
+  HStack,
+  Icon,
+  Badge,
+  Divider,
+  useColorModeValue,
+  StatGroup,
   Stat,
   StatLabel,
   StatNumber,
-  StatGroup,
-  Divider,
-  HStack,
-  Icon,
 } from '@chakra-ui/react';
 import { FiCreditCard, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import api from '../../../services/api';
+
+interface Payment {
+  _id: string;
+  serviceId: string;
+  serviceName: string;
+  amount: number;
+  status: 'pending' | 'completed' | 'failed';
+  paymentDate: string;
+  transactionId: string;
+}
 
 const formatIndianCurrency = (amount: number): string => {
   const formatter = new Intl.NumberFormat('en-IN', {
@@ -41,34 +51,25 @@ const formatIndianCurrency = (amount: number): string => {
   return formatter.format(amount);
 };
 
-interface Payment {
-  _id: string;
-  serviceId: string;
-  serviceName: string;
-  amount: number;
-  status: 'pending' | 'completed' | 'failed';
-  paymentDate: string;
-  transactionId: string;
-  description: string;
-}
-
-interface PaymentStats {
-  totalPayments: number;
-  pendingAmount: number;
-  completedAmount: number;
-}
-
 const PaymentSection: React.FC = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [stats, setStats] = useState<PaymentStats>({
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [stats, setStats] = useState({
     totalPayments: 0,
     pendingAmount: 0,
     completedAmount: 0,
   });
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
+
+  // Color mode values
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const textColor = useColorModeValue('gray.800', 'whiteAlpha.900');
+  const secondaryTextColor = useColorModeValue('gray.600', 'gray.300');
+  const tableHeaderBg = useColorModeValue('gray.50', 'gray.700');
+  const tableBorderColor = useColorModeValue('gray.200', 'gray.600');
+  const hoverBg = useColorModeValue('gray.50', 'gray.700');
 
   useEffect(() => {
     fetchPayments();
@@ -81,51 +82,6 @@ const PaymentSection: React.FC = () => {
       setStats(response.data.stats);
     } catch (error) {
       console.error('Error fetching payments:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch payments',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
-
-  const handlePayment = async (payment: Payment) => {
-    setSelectedPayment(payment);
-    onOpen();
-  };
-
-  const processPayment = async () => {
-    if (!selectedPayment) return;
-
-    setLoading(true);
-    try {
-      await api.patch(`/payments/${selectedPayment._id}/status`, {
-        status: 'completed'
-      });
-
-      toast({
-        title: 'Success',
-        description: 'Payment processed successfully',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-
-      await fetchPayments();
-      onClose();
-    } catch (error) {
-      console.error('Error processing payment:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to process payment',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -134,7 +90,7 @@ const PaymentSection: React.FC = () => {
       case 'completed':
         return 'green';
       case 'pending':
-        return 'yellow';
+        return 'orange';
       case 'failed':
         return 'red';
       default:
@@ -155,27 +111,54 @@ const PaymentSection: React.FC = () => {
     }
   };
 
-  return (
-    <Box p={4}>
-      <Text fontSize="2xl" fontWeight="bold" mb={6}>
-        Your Payments
-      </Text>
+  const handlePayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    onOpen();
+  };
 
-      {/* Payment Statistics */}
-      <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg="white">
+  const processPayment = async () => {
+    if (!selectedPayment) return;
+
+    setLoading(true);
+    try {
+      await api.patch(`/payments/${selectedPayment._id}/status`, {
+        status: 'completed'
+      });
+
+      await fetchPayments();
+      onClose();
+    } catch (error) {
+      console.error('Error processing payment:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <VStack spacing={6} align="stretch">
+      <Box
+        bg={bgColor}
+        p={6}
+        borderRadius="lg"
+        borderWidth={1}
+        borderColor={borderColor}
+        shadow="sm"
+      >
         <StatGroup>
           <Stat>
-            <StatLabel>Total Payments</StatLabel>
-            <StatNumber>{formatIndianCurrency(stats.totalPayments)}</StatNumber>
+            <StatLabel color={secondaryTextColor}>Total Payments</StatLabel>
+            <StatNumber color={textColor}>
+              {formatIndianCurrency(stats.totalPayments)}
+            </StatNumber>
           </Stat>
           <Stat>
-            <StatLabel>Pending Amount</StatLabel>
+            <StatLabel color={secondaryTextColor}>Pending Amount</StatLabel>
             <StatNumber color="orange.500">
               {formatIndianCurrency(stats.pendingAmount)}
             </StatNumber>
           </Stat>
           <Stat>
-            <StatLabel>Completed Amount</StatLabel>
+            <StatLabel color={secondaryTextColor}>Completed Amount</StatLabel>
             <StatNumber color="green.500">
               {formatIndianCurrency(stats.completedAmount)}
             </StatNumber>
@@ -183,107 +166,105 @@ const PaymentSection: React.FC = () => {
         </StatGroup>
       </Box>
 
-      {/* Payments Table */}
-      <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg="white">
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Service</Th>
-              <Th>Amount</Th>
-              <Th>Status</Th>
-              <Th>Transaction ID</Th>
-              <Th>Date</Th>
-              <Th>Action</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {payments.map((payment) => (
-              <Tr key={payment._id}>
-                <Td>{payment.serviceName}</Td>
-                <Td>{formatIndianCurrency(payment.amount)}</Td>
-                <Td>
-                  <HStack>
-                    <Icon 
-                      as={getStatusIcon(payment.status)} 
-                      color={`${getStatusColor(payment.status)}.500`}
-                    />
-                    <Badge colorScheme={getStatusColor(payment.status)}>
-                      {payment.status}
-                    </Badge>
-                  </HStack>
-                </Td>
-                <Td>
-                  <Text fontSize="sm" color="gray.600">
-                    {payment.transactionId}
-                  </Text>
-                </Td>
-                <Td>
-                  {new Date(payment.paymentDate).toLocaleDateString('en-IN')}
-                </Td>
-                <Td>
-                  {payment.status === 'pending' && (
-                    <Button
-                      leftIcon={<FiCreditCard />}
-                      colorScheme="blue"
-                      size="sm"
-                      onClick={() => handlePayment(payment)}
-                    >
-                      Pay Now
-                    </Button>
-                  )}
-                </Td>
+      <Box
+        bg={bgColor}
+        p={6}
+        borderRadius="lg"
+        borderWidth={1}
+        borderColor={borderColor}
+        shadow="sm"
+      >
+        <Heading size="md" mb={6} color={textColor}>Payment History</Heading>
+        <Box overflowX="auto">
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th bg={tableHeaderBg} color={secondaryTextColor}>Service</Th>
+                <Th bg={tableHeaderBg} color={secondaryTextColor}>Amount</Th>
+                <Th bg={tableHeaderBg} color={secondaryTextColor}>Status</Th>
+                <Th bg={tableHeaderBg} color={secondaryTextColor}>Transaction ID</Th>
+                <Th bg={tableHeaderBg} color={secondaryTextColor}>Date</Th>
+                <Th bg={tableHeaderBg} color={secondaryTextColor}>Action</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
+            </Thead>
+            <Tbody>
+              {payments.map((payment) => (
+                <Tr 
+                  key={payment._id}
+                  _hover={{ bg: hoverBg }}
+                  borderColor={tableBorderColor}
+                >
+                  <Td color={textColor}>{payment.serviceName}</Td>
+                  <Td color={textColor}>{formatIndianCurrency(payment.amount)}</Td>
+                  <Td>
+                    <HStack>
+                      <Icon 
+                        as={getStatusIcon(payment.status)} 
+                        color={`${getStatusColor(payment.status)}.500`}
+                      />
+                      <Badge colorScheme={getStatusColor(payment.status)}>
+                        {payment.status}
+                      </Badge>
+                    </HStack>
+                  </Td>
+                  <Td>
+                    <Text fontSize="sm" color={secondaryTextColor}>
+                      {payment.transactionId}
+                    </Text>
+                  </Td>
+                  <Td color={textColor}>
+                    {new Date(payment.paymentDate).toLocaleDateString('en-IN')}
+                  </Td>
+                  <Td>
+                    {payment.status === 'pending' && (
+                      <Button
+                        leftIcon={<FiCreditCard />}
+                        colorScheme="blue"
+                        size="sm"
+                        onClick={() => handlePayment(payment)}
+                      >
+                        Pay Now
+                      </Button>
+                    )}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
       </Box>
 
-      {/* Payment Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Process Payment</ModalHeader>
+        <ModalContent bg={bgColor}>
+          <ModalHeader color={textColor}>Complete Payment</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <VStack spacing={4} align="stretch">
+            <VStack spacing={4} align="stretch" pb={6}>
               <Box>
-                <Text fontWeight="bold">Service:</Text>
-                <Text>{selectedPayment?.serviceName}</Text>
+                <Text fontWeight="bold" color={secondaryTextColor}>Service</Text>
+                <Text color={textColor}>{selectedPayment?.serviceName}</Text>
               </Box>
-              <Divider />
               <Box>
-                <Text fontWeight="bold">Amount:</Text>
-                <Text fontSize="xl" color="blue.600">
+                <Text fontWeight="bold" color={secondaryTextColor}>Amount</Text>
+                <Text fontSize="xl" color="blue.500">
                   {selectedPayment && formatIndianCurrency(selectedPayment.amount)}
                 </Text>
               </Box>
               <Divider />
-              <Box>
-                <Text fontWeight="bold">Transaction ID:</Text>
-                <Text color="gray.600">{selectedPayment?.transactionId}</Text>
-              </Box>
-              <Box>
-                <Text fontWeight="bold">Description:</Text>
-                <Text>{selectedPayment?.description}</Text>
-              </Box>
+              <Button 
+                colorScheme="blue" 
+                leftIcon={<FiCreditCard />} 
+                isLoading={loading}
+                onClick={processPayment}
+              >
+                Proceed to Payment
+              </Button>
             </VStack>
           </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              colorScheme="blue"
-              leftIcon={<FiCreditCard />}
-              onClick={processPayment}
-              isLoading={loading}
-            >
-              Pay Now
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
-    </Box>
+    </VStack>
   );
 };
 

@@ -14,6 +14,8 @@ import {
   HStack,
   Divider,
   Heading,
+  Image,
+  Link,
 } from '@chakra-ui/react';
 import { FiSend, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiGithub } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -21,8 +23,9 @@ import { useNavigate } from 'react-router-dom';
 const Footer: React.FC = () => {
   const navigate = useNavigate();
   const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.600', 'gray.400');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const logoFilter = useColorModeValue('none', 'brightness(0) invert(1)');
 
   const ListHeader = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -46,7 +49,7 @@ const Footer: React.FC = () => {
           spacing={8}
         >
           <Stack spacing={6}>
-            <Box>
+            <VStack align="start" spacing={1}>
               <Heading
                 color={useColorModeValue('gray.700', 'white')}
                 fontSize={'2xl'}
@@ -55,7 +58,15 @@ const Footer: React.FC = () => {
               >
                 Shreetech
               </Heading>
-            </Box>
+              <Text
+                fontSize="sm"
+                color={textColor}
+                fontStyle="italic"
+                mt={1}
+              >
+                A unit of Shree PublicEase Services
+              </Text>
+            </VStack>
             <Text fontSize={'sm'}>
               {new Date().getFullYear()} Shreetech. All rights reserved
             </Text>
@@ -119,33 +130,33 @@ const Footer: React.FC = () => {
           </Stack>
           <Stack align={'flex-start'}>
             <ListHeader>Company</ListHeader>
-            <Box as="a" href="/about" _hover={{ color: 'blue.400' }}>
+            <Link href="/about" _hover={{ color: 'blue.400' }}>
               About Us
-            </Box>
-            <Box as="a" href="/features" _hover={{ color: 'blue.400' }}>
+            </Link>
+            <Link href="/features" _hover={{ color: 'blue.400' }}>
               Features
-            </Box>
-            <Box as="a" href="/contact" _hover={{ color: 'blue.400' }}>
+            </Link>
+            <Link href="/contact" _hover={{ color: 'blue.400' }}>
               Contact Us
-            </Box>
-            <Box as="a" href="#" _hover={{ color: 'blue.400' }}>
+            </Link>
+            <Link href="#" _hover={{ color: 'blue.400' }}>
               Careers
-            </Box>
+            </Link>
           </Stack>
           <Stack align={'flex-start'}>
             <ListHeader>Support</ListHeader>
-            <Box as="a" href="#" _hover={{ color: 'blue.400' }}>
+            <Link href="#" _hover={{ color: 'blue.400' }}>
               Help Center
-            </Box>
-            <Box as="a" href="#" _hover={{ color: 'blue.400' }}>
+            </Link>
+            <Link href="#" _hover={{ color: 'blue.400' }}>
               Terms of Service
-            </Box>
-            <Box as="a" href="#" _hover={{ color: 'blue.400' }}>
+            </Link>
+            <Link href="#" _hover={{ color: 'blue.400' }}>
               Privacy Policy
-            </Box>
-            <Box as="a" href="#" _hover={{ color: 'blue.400' }}>
+            </Link>
+            <Link href="#" _hover={{ color: 'blue.400' }}>
               Status
-            </Box>
+            </Link>
           </Stack>
           <Stack align={'flex-start'}>
             <ListHeader>Stay up to date</ListHeader>

@@ -12,7 +12,11 @@ import {
   FormLabel,
   Input,
   HStack,
+  useColorModeValue,
+  Icon,
+  Badge,
 } from '@chakra-ui/react';
+import { FiMail, FiPhone, FiUser } from 'react-icons/fi';
 import { useAuth } from '../../hooks/useAuth';
 
 const UserProfile = () => {
@@ -24,6 +28,12 @@ const UserProfile = () => {
     lastName: user?.lastName || '',
     email: user?.email || '',
   });
+
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const textColor = useColorModeValue('gray.800', 'whiteAlpha.900');
+  const labelColor = useColorModeValue('gray.600', 'gray.400');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -66,14 +76,15 @@ const UserProfile = () => {
             size="2xl"
             name={`${user?.firstName} ${user?.lastName}`}
             src={user?.avatar || undefined}
+            bg={iconColor}
           />
-          <Text mt={4} fontSize="2xl" fontWeight="bold">
+          <Text mt={4} fontSize="2xl" fontWeight="bold" color={textColor}>
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text color="gray.600">{user?.email}</Text>
+          <Text color={textColor}>{user?.email}</Text>
         </Box>
 
-        <Box p={6} borderWidth={1} borderRadius="lg" bg="white">
+        <Box p={6} borderWidth={1} borderRadius="lg" bg={bgColor} borderColor={borderColor} shadow="sm">
           <VStack spacing={6} align="stretch">
             <Heading size="md">Profile Information</Heading>
             {isEditing ? (
@@ -118,16 +129,22 @@ const UserProfile = () => {
             ) : (
               <VStack align="stretch" spacing={4}>
                 <Box>
-                  <Text fontWeight="bold">First Name</Text>
-                  <Text>{user?.firstName}</Text>
+                  <Text fontWeight="bold" fontSize="sm" color={labelColor}>
+                    First Name
+                  </Text>
+                  <Text color={textColor}>{user?.firstName}</Text>
                 </Box>
                 <Box>
-                  <Text fontWeight="bold">Last Name</Text>
-                  <Text>{user?.lastName}</Text>
+                  <Text fontWeight="bold" fontSize="sm" color={labelColor}>
+                    Last Name
+                  </Text>
+                  <Text color={textColor}>{user?.lastName}</Text>
                 </Box>
                 <Box>
-                  <Text fontWeight="bold">Email</Text>
-                  <Text>{user?.email}</Text>
+                  <Text fontWeight="bold" fontSize="sm" color={labelColor}>
+                    Email
+                  </Text>
+                  <Text color={textColor}>{user?.email}</Text>
                 </Box>
                 <Button alignSelf="flex-end" onClick={handleEdit}>
                   Edit Profile

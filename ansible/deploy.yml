@@ -119,12 +119,16 @@
     - name: Pull latest images
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
         pull: "always"
         state: present
 
     - name: Start services
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
         state: present
 
     - name: Wait for nginx to start
@@ -140,6 +144,8 @@
     - name: Stop nginx temporarily
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
         services: ["frontend"]
         state: stopped
       when: not cert_exists.stat.exists
@@ -165,5 +171,7 @@
     - name: Restart services with SSL
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
         state: present
         restarted: yes

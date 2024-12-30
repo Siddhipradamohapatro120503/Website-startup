@@ -73,14 +73,20 @@ jobs:
         ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
         
     - name: Run Ansible Playbook
+      env:
+        ANSIBLE_HOST_KEY_CHECKING: "false"
       run: |
         cd ansible
         ansible-playbook -i inventory.yml deploy.yml \
-          --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} \
-                       mongo_user=${{ secrets.MONGO_USER }} \
-                       mongo_password=${{ secrets.MONGO_PASSWORD }} \
-                       server_ip=${{ secrets.SERVER_IP }} \
-                       domain=${{ secrets.DOMAIN_NAME }} \
-                       certbot_email=${{ secrets.CERTBOT_EMAIL }} \
-                       razorpay_key_id=${{ secrets.RAZORPAY_KEY_ID }} \
-                       razorpay_key_secret=${{ secrets.RAZORPAY_KEY_SECRET }}"
+          --extra-vars '{
+            "dockerhub_username": "${{ secrets.DOCKERHUB_USERNAME }}",
+            "dockerhub_token": "${{ secrets.DOCKERHUB_TOKEN }}",
+            "mongo_user": "${{ secrets.MONGO_USER }}",
+            "mongo_password": "${{ secrets.MONGO_PASSWORD }}",
+            "server_ip": "${{ secrets.SERVER_IP }}",
+            "domain": "${{ secrets.DOMAIN_NAME }}",
+            "certbot_email": "${{ secrets.CERTBOT_EMAIL }}",
+            "razorpay_key_id": "${{ secrets.RAZORPAY_KEY_ID }}",
+            "razorpay_key_secret": "${{ secrets.RAZORPAY_KEY_SECRET }}",
+            "jwt_secret": "${{ secrets.JWT_SECRET }}"
+          }'

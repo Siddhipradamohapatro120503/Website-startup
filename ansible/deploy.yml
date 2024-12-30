@@ -10,6 +10,10 @@
     email: "{{ certbot_email }}"
     razorpay_key_id: "{{ vault_razorpay_key_id }}"
     razorpay_key_secret: "{{ vault_razorpay_key_secret }}"
+    mongo_user: "{{ mongo_user }}"
+    mongo_password: "{{ mongo_password }}"
+    mongo_port: 27017
+    mongodb_uri: "mongodb://{{ mongo_user }}:{{ mongo_password }}@localhost:{{ mongo_port }}/startup_db"
 
   tasks:
     - name: Install required packages

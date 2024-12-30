@@ -116,46 +116,43 @@
         username: "{{ dockerhub_username }}"
         password: "{{ dockerhub_token }}"
 
-    - name: Check if port 80 is in use
-      wait_for:
-        port: 80
-        state: started
-        timeout: 5
-      ignore_errors: yes
-      register: port_check
-
-    - name: Stop all Docker containers if port 80 is in use
-      shell: docker stop $(docker ps -q)
-      ignore_errors: yes
-      when: port_check.failed == false
-
-    - name: Force remove all Docker containers
-      shell: docker rm -f $(docker ps -aq)
+    - name: Get list of running containers
+      shell: docker ps -q
+      register: running_containers
       ignore_errors: yes
 
-    - name: Kill any process using port 80
-      shell: |
-        lsof -ti:80 | xargs kill -9
+    - name: Stop running Docker containers
+      shell: docker stop {{ running_containers.stdout }}
+      ignore_errors: yes
+      when: running_containers.stdout != ""
+
+    - name: Get list of all containers
+      shell: docker ps -aq
+      register: all_containers
       ignore_errors: yes
 
-    - name: Wait to ensure port 80 is free
-      wait_for:
-        port: 80
-        state: stopped
-        timeout: 30
-
-    - name: Pull latest images
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        pull: "always"
-        state: present
-        services:
-          - frontend
-          - backend
-          - mongodb
+    - name: Remove all Docker containers
+      shell: docker rm -f {{ all_containers.stdout }}
       ignore_errors: yes
+      when: all_containers.stdout != ""
+
+    - name: Find and kill process using port 80 (Windows)
+      win_shell: |
+        $processIds = @()
+        $processIds += Get-NetTCPConnection -LocalPort 80 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess
+        foreach ($pid in $processIds) {
+            try {
+                Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+                Write-Host "Stopped process with ID: $pid"
+            } catch {
+                Write-Host "Failed to stop process with ID: $pid"
+            }
+        }
+      ignore_errors: yes
+
+    - name: Pause for processes to stop
+      pause:
+        seconds: 5
 
     - name: Ensure Docker network exists
       docker_network:
@@ -181,11 +178,15 @@
         state: present
         build: "never"
 
-    - name: Wait for MongoDB to be ready
-      wait_for:
-        port: 27017
-        timeout: 60
-        delay: 10
+    - name: Wait for MongoDB container to be healthy
+      shell: >
+        docker inspect --format='{{.State.Health.Status}}'
+        $(docker-compose -f {{ docker_compose_file }} ps -q mongodb)
+      register: mongodb_health
+      until: mongodb_health.stdout == "healthy"
+      retries: 30
+      delay: 10
+      ignore_errors: yes
 
     - name: Start remaining services
       community.docker.docker_compose_v2:
@@ -199,10 +200,15 @@
         build: "never"
       register: compose_result
 
-    - name: Wait for services to be healthy
-      wait_for:
-        timeout: 30
-      when: compose_result is success
+    - name: Wait for backend to be healthy
+      shell: >
+        docker inspect --format='{{.State.Health.Status}}'
+        $(docker-compose -f {{ docker_compose_file }} ps -q backend)
+      register: backend_health
+      until: backend_health.stdout == "healthy"
+      retries: 30
+      delay: 10
+      ignore_errors: yes
 
     - name: Check if certificate exists
       stat:

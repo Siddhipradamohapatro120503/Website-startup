@@ -8,7 +8,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
       - REACT_APP_API_URL=http://localhost/api
     networks:
@@ -27,10 +28,17 @@ services:
       - MONGODB_URI=mongodb://${mongo_user}:${mongo_password}@mongodb:27017/startup_db?authSource=admin
       - NODE_ENV=production
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     networks:
       - app-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   mongodb:
     image: mongo:latest
@@ -45,6 +53,12 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/startup_db --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
 networks:
   app-network:

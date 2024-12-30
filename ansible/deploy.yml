@@ -46,6 +46,12 @@
         state: present
         update_cache: yes
 
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
     - name: Install Docker Compose plugin
       shell: |
         DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}

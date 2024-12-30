@@ -123,6 +123,25 @@
           - "docker-compose.prod.yml"
         pull: "always"
         state: present
+        services:
+          - frontend
+          - backend
+          - mongodb
+      ignore_errors: yes
+
+    - name: Ensure Docker network exists
+      docker_network:
+        name: app-network
+        state: present
+      ignore_errors: yes
+
+    - name: Create Docker volumes
+      docker_volume:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - "mongodb_data"
+      ignore_errors: yes
 
     - name: Start services
       community.docker.docker_compose_v2:
@@ -130,6 +149,19 @@
         files:
           - "docker-compose.prod.yml"
         state: present
+        build: no
+      register: compose_result
+      ignore_errors: yes
+
+    - name: Debug compose result
+      debug:
+        var: compose_result
+      when: compose_result is defined
+
+    - name: Wait for services to be healthy
+      wait_for:
+        timeout: 30
+      when: compose_result is success
 
     - name: Wait for nginx to start
       wait_for:

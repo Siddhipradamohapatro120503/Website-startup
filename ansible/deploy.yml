@@ -60,10 +60,8 @@
         mode: '0644'
 
     - name: Stop existing services
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
-        files:
-          - docker-compose.prod.yml
         state: absent
 
     - name: Log into DockerHub
@@ -72,18 +70,14 @@
         password: "{{ dockerhub_token }}"
 
     - name: Pull latest images
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
-        files:
-          - docker-compose.prod.yml
         pull: yes
         state: present
 
     - name: Start services
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
-        files:
-          - docker-compose.prod.yml
         state: present
 
     - name: Wait for nginx to start
@@ -97,7 +91,7 @@
       register: cert_exists
 
     - name: Stop nginx temporarily
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
         services: ["frontend"]
         state: stopped
@@ -122,9 +116,7 @@
         job: "docker compose -f {{ docker_compose_file }} down && certbot renew --quiet && docker compose -f {{ docker_compose_file }} up -d"
 
     - name: Restart services with SSL
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
-        files:
-          - docker-compose.prod.yml
         state: present
         restarted: yes

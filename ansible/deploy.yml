@@ -111,6 +111,12 @@
             name: mongodb_data
             state: present
 
+        - name: Pull latest images
+          community.docker.docker_compose_v2:
+            project_src: "{{ app_dir }}"
+            files: ["docker-compose.prod.yml"]
+            pull: true
+
         - name: Start MongoDB
           community.docker.docker_compose_v2:
             project_src: "{{ app_dir }}"
@@ -118,16 +124,39 @@
             services: ["mongodb"]
             state: present
 
-        - name: Wait for MongoDB
-          pause:
-            seconds: 30
+        - name: Wait for MongoDB to be healthy
+          shell: >
+            docker inspect $(docker ps -q --filter name=mongodb) --format='{{.State.Health.Status}}'
+          register: mongodb_health
+          until: mongodb_health.stdout == "healthy"
+          retries: 30
+          delay: 10
+          ignore_errors: yes
 
-        - name: Start remaining services
+        - name: Start backend service
           community.docker.docker_compose_v2:
             project_src: "{{ app_dir }}"
             files: ["docker-compose.prod.yml"]
-            services: ["backend", "frontend"]
+            services: ["backend"]
             state: present
+          when: mongodb_health.stdout == "healthy"
+
+        - name: Wait for backend to be healthy
+          shell: >
+            docker inspect $(docker ps -q --filter name=backend) --format='{{.State.Health.Status}}'
+          register: backend_health
+          until: backend_health.stdout == "healthy"
+          retries: 30
+          delay: 10
+          ignore_errors: yes
+
+        - name: Start frontend service
+          community.docker.docker_compose_v2:
+            project_src: "{{ app_dir }}"
+            files: ["docker-compose.prod.yml"]
+            services: ["frontend"]
+            state: present
+          when: backend_health.stdout == "healthy"
 
     - name: Setup SSL
       block:

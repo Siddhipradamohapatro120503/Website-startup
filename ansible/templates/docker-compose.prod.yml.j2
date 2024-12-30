@@ -12,7 +12,8 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -22,23 +23,42 @@ services:
     expose:
       - "5000"
     environment:
-      - MONGODB_URI=mongodb://{{ mongo_user }}:{{ mongo_password }}@mongodb:27017/startup-platform?authSource=admin
+      - MONGODB_URI=mongodb://{{ mongo_user }}:{{ mongo_password }}@mongodb:27017/startup_db?authSource=admin
       - NODE_ENV=production
+      - RAZORPAY_KEY_ID={{ razorpay_key_id }}
+      - RAZORPAY_KEY_SECRET={{ razorpay_key_secret }}
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   mongodb:
     image: mongo:latest
     restart: always
+    ports:
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: {{ mongo_user }}
       MONGO_INITDB_ROOT_PASSWORD: {{ mongo_password }}
+      MONGO_INITDB_DATABASE: startup_db
     volumes:
       - mongodb_data:/data/db
     networks:
       - app-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://{{ mongo_user }}:{{ mongo_password }}@localhost:27017/startup_db?authSource=admin --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    command: ["mongod", "--bind_ip_all"]
 
 networks:
   app-network:

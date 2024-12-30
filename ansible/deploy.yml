@@ -5,54 +5,48 @@
   vars:
     app_dir: /opt/startup-app
     docker_compose_file: "{{ app_dir }}/docker-compose.prod.yml"
-    env_file: "{{ app_dir }}/.env"
     domain_name: "{{ domain }}"
     email: "{{ certbot_email }}"
-    razorpay_key_id: "{{ vault_razorpay_key_id }}"
-    razorpay_key_secret: "{{ vault_razorpay_key_secret }}"
-    mongo_user: "{{ mongo_user }}"
-    mongo_password: "{{ mongo_password }}"
-    mongo_port: 27017
-    mongodb_uri: "mongodb://{{ mongo_user }}:{{ mongo_password }}@localhost:{{ mongo_port }}/startup_db"
 
   tasks:
-    - name: Install required system packages
+    - name: Install dependencies
       apt:
-        name: "{{ item }}"
+        name: 
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - python3-docker
+          - lsof
         state: present
         update_cache: yes
-      loop:
-        - apt-transport-https
-        - ca-certificates
-        - curl
-        - software-properties-common
-        - python3-pip
-        - virtualenv
-        - python3-setuptools
-
-    - name: Add Docker GPG apt Key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: Add Docker Repository
-      apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu focal stable
-        state: present
 
     - name: Install Docker
-      apt:
-        name: docker-ce
-        state: present
-        update_cache: yes
+      block:
+        - name: Add Docker GPG key
+          apt_key:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            state: present
 
-    - name: Start and enable Docker service
-      systemd:
-        name: docker
-        state: started
-        enabled: yes
+        - name: Add Docker repository
+          apt_repository:
+            repo: deb https://download.docker.com/linux/ubuntu focal stable
+            state: present
 
-    - name: Install Docker Compose plugin
+        - name: Install Docker CE
+          apt:
+            name: docker-ce
+            state: present
+            update_cache: yes
+
+        - name: Start Docker service
+          systemd:
+            name: docker
+            state: started
+            enabled: yes
+
+    - name: Install Docker Compose
       shell: |
         DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
         mkdir -p $DOCKER_CONFIG/cli-plugins
@@ -61,235 +55,92 @@
       args:
         creates: /root/.docker/cli-plugins/docker-compose
 
-    - name: Install Docker SDK for Python
-      apt:
-        name: python3-docker
-        state: present
-        update_cache: yes
+    - name: Setup application
+      block:
+        - name: Create required directories
+          file:
+            path: "{{ item }}"
+            state: directory
+            mode: '0755'
+          loop:
+            - "{{ app_dir }}"
+            - "{{ app_dir }}/nginx"
+            - "{{ app_dir }}/certbot"
 
-    - name: Create application directory
-      file:
-        path: "{{ app_dir }}"
-        state: directory
-        mode: '0755'
+        - name: Copy configuration files
+          template:
+            src: "templates/{{ item.src }}"
+            dest: "{{ app_dir }}/{{ item.dest }}"
+            mode: '0644'
+          loop:
+            - { src: 'nginx.conf.j2', dest: 'nginx/nginx.conf' }
+            - { src: 'docker-compose.prod.yml.j2', dest: 'docker-compose.prod.yml' }
+            - { src: '.env.j2', dest: '.env' }
 
-    - name: Create nginx configuration directory
-      file:
-        path: "{{ app_dir }}/nginx"
-        state: directory
-        mode: '0755'
+    - name: Clean up existing deployment
+      block:
+        - name: Stop running containers
+          shell: docker stop $(docker ps -q)
+          ignore_errors: yes
 
-    - name: Create letsencrypt directory
-      file:
-        path: "{{ app_dir }}/certbot"
-        state: directory
-        mode: '0755'
+        - name: Remove containers
+          shell: docker rm -f $(docker ps -aq)
+          ignore_errors: yes
 
-    - name: Copy nginx configuration
-      template:
-        src: templates/nginx.conf.j2
-        dest: "{{ app_dir }}/nginx/nginx.conf"
-        mode: '0644'
+        - name: Kill process on port 80
+          shell: lsof -ti:80 | xargs kill -9
+          ignore_errors: yes
 
-    - name: Copy docker-compose file
-      template:
-        src: templates/docker-compose.prod.yml.j2
-        dest: "{{ docker_compose_file }}"
-        mode: '0644'
+    - name: Deploy application
+      block:
+        - name: Create Docker network
+          docker_network:
+            name: app-network
+            state: present
 
-    - name: Stop existing services
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        state: absent
-      ignore_errors: yes
+        - name: Create Docker volumes
+          docker_volume:
+            name: mongodb_data
+            state: present
 
-    - name: Copy environment file
-      template:
-        src: templates/.env.j2
-        dest: "{{ env_file }}"
-        mode: '0644'
+        - name: Start MongoDB
+          community.docker.docker_compose_v2:
+            project_src: "{{ app_dir }}"
+            files: ["docker-compose.prod.yml"]
+            services: ["mongodb"]
+            state: present
 
-    - name: Log into DockerHub
-      docker_login:
-        username: "{{ dockerhub_username }}"
-        password: "{{ dockerhub_token }}"
+        - name: Wait for MongoDB
+          pause:
+            seconds: 30
 
-    - name: Get list of running containers
-      shell: docker ps -q
-      register: running_containers
-      ignore_errors: yes
+        - name: Start remaining services
+          community.docker.docker_compose_v2:
+            project_src: "{{ app_dir }}"
+            files: ["docker-compose.prod.yml"]
+            services: ["backend", "frontend"]
+            state: present
 
-    - name: Stop running Docker containers
-      shell: docker stop {{ running_containers.stdout }}
-      ignore_errors: yes
-      when: running_containers.stdout != ""
+    - name: Setup SSL
+      block:
+        - name: Check for existing certificate
+          stat:
+            path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+          register: cert_file
 
-    - name: Get list of all containers
-      shell: docker ps -aq
-      register: all_containers
-      ignore_errors: yes
+        - name: Get SSL certificate
+          shell: >
+            certbot certonly --webroot 
+            -w /var/www/certbot 
+            -d {{ domain_name }}
+            --email {{ email }}
+            --agree-tos
+            --non-interactive
+          when: not cert_file.stat.exists
+          ignore_errors: yes
 
-    - name: Remove all Docker containers
-      shell: docker rm -f {{ all_containers.stdout }}
-      ignore_errors: yes
-      when: all_containers.stdout != ""
-
-    - name: Install lsof if not present
-      apt:
-        name: lsof
-        state: present
-      become: yes
-      ignore_errors: yes
-
-    - name: Find process using port 80
-      shell: lsof -ti:80
-      register: port_80_pid
-      ignore_errors: yes
-
-    - name: Kill process using port 80 if found
-      shell: "kill -9 {{ port_80_pid.stdout }}"
-      ignore_errors: yes
-      when: port_80_pid.stdout != ""
-
-    - name: Pause for processes to stop
-      pause:
-        seconds: 5
-
-    - name: Ensure Docker network exists
-      docker_network:
-        name: app-network
-        state: present
-      ignore_errors: yes
-
-    - name: Create Docker volumes
-      docker_volume:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - "mongodb_data"
-      ignore_errors: yes
-
-    - name: Start MongoDB first
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        services:
-          - mongodb
-        state: present
-        build: "never"
-
-    - name: Wait for MongoDB container to be healthy
-      shell: docker inspect $(docker ps -q --filter name=mongodb) --format="{% raw %}{{.State.Health.Status}}{% endraw %}"
-      register: mongodb_health
-      until: mongodb_health.stdout == "healthy"
-      retries: 30
-      delay: 10
-      ignore_errors: yes
-
-    - name: Start remaining services
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        services:
-          - backend
-          - frontend
-        state: present
-        build: "never"
-      register: compose_result
-
-    - name: Wait for backend to be healthy
-      shell: docker inspect $(docker ps -q --filter name=backend) --format="{% raw %}{{.State.Health.Status}}{% endraw %}"
-      register: backend_health
-      until: backend_health.stdout == "healthy"
-      retries: 30
-      delay: 10
-      ignore_errors: yes
-
-    - name: Check if certificate exists
-      stat:
-        path: /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
-      register: cert_file
-
-    - name: Stop frontend container for certificate acquisition
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        services:
-          - frontend
-        state: stopped
-      when: not cert_file.stat.exists
-
-    - name: Wait for port 80 to be free
-      wait_for:
-        port: 80
-        state: stopped
-        timeout: 30
-      when: not cert_file.stat.exists
-
-    - name: Install certbot
-      apt:
-        name: certbot
-        state: present
-      become: yes
-      when: not cert_file.stat.exists
-
-    - name: Create webroot directory
-      file:
-        path: /var/www/certbot
-        state: directory
-        mode: '0755'
-      become: yes
-      when: not cert_file.stat.exists
-
-    - name: Get SSL certificate
-      shell: >
-        certbot certonly --webroot 
-        -w /var/www/certbot 
-        -d {{ domain_name }}
-        --email {{ email }}
-        --agree-tos
-        --non-interactive
-        --preferred-challenges http
-      become: yes
-      when: not cert_file.stat.exists
-      register: certbot_result
-      ignore_errors: yes
-
-    - name: Display certbot logs if failed
-      shell: cat /var/log/letsencrypt/letsencrypt.log
-      when: certbot_result.rc is defined and certbot_result.rc != 0
-      register: certbot_logs
-      ignore_errors: yes
-
-    - name: Show certbot logs
-      debug:
-        var: certbot_logs.stdout_lines
-      when: certbot_logs is defined
-
-    - name: Wait after certificate acquisition
-      pause:
-        seconds: 10
-      when: not cert_file.stat.exists
-
-    - name: Restart frontend with SSL
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        services:
-          - frontend
-        state: present
-        build: "never"
-
-    - name: Create certbot renewal cron job
-      cron:
-        name: "Certbot Renewal"
-        minute: "0"
-        hour: "0"
-        day: "1"
-        job: "docker compose -f {{ docker_compose_file }} down && certbot renew --quiet && docker compose -f {{ docker_compose_file }} up -d"
+        - name: Setup certificate renewal
+          cron:
+            name: "Certbot Renewal"
+            special_time: daily
+            job: "certbot renew --quiet --deploy-hook 'docker compose -f {{ docker_compose_file }} restart frontend'"

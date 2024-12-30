@@ -97,16 +97,19 @@
         dest: "{{ docker_compose_file }}"
         mode: '0644'
 
+    - name: Stop existing services
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
+        state: absent
+      ignore_errors: yes
+
     - name: Copy environment file
       template:
         src: templates/.env.j2
         dest: "{{ env_file }}"
         mode: '0644'
-
-    - name: Stop existing services
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        state: absent
 
     - name: Log into DockerHub
       docker_login:

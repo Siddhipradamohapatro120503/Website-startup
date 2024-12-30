@@ -116,6 +116,34 @@
         username: "{{ dockerhub_username }}"
         password: "{{ dockerhub_token }}"
 
+    - name: Check if port 80 is in use
+      wait_for:
+        port: 80
+        state: started
+        timeout: 5
+      ignore_errors: yes
+      register: port_check
+
+    - name: Stop all Docker containers if port 80 is in use
+      shell: docker stop $(docker ps -q)
+      ignore_errors: yes
+      when: port_check.failed == false
+
+    - name: Force remove all Docker containers
+      shell: docker rm -f $(docker ps -aq)
+      ignore_errors: yes
+
+    - name: Kill any process using port 80
+      shell: |
+        lsof -ti:80 | xargs kill -9
+      ignore_errors: yes
+
+    - name: Wait to ensure port 80 is free
+      wait_for:
+        port: 80
+        state: stopped
+        timeout: 30
+
     - name: Pull latest images
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
@@ -143,6 +171,30 @@
         - "mongodb_data"
       ignore_errors: yes
 
+    - name: Check if certificate exists
+      stat:
+        path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+      register: cert_exists
+
+    - name: Get SSL certificate when needed
+      block:
+        - name: Get SSL certificate
+          command: >
+            certbot certonly --standalone
+            -d {{ domain_name }}
+            --email {{ email }}
+            --agree-tos
+            --non-interactive
+            --preferred-challenges http
+          register: certbot_result
+
+        - name: Wait after certificate acquisition
+          wait_for:
+            timeout: 10
+
+      when: not cert_exists.stat.exists
+      ignore_errors: yes
+
     - name: Start services
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
@@ -151,7 +203,6 @@
         state: present
         build: "never"
       register: compose_result
-      ignore_errors: yes
 
     - name: Debug compose result
       debug:
@@ -162,54 +213,6 @@
       wait_for:
         timeout: 30
       when: compose_result is success
-
-    - name: Wait for nginx to start
-      wait_for:
-        port: 80
-        timeout: 60
-
-    - name: Check if certificate exists
-      stat:
-        path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
-      register: cert_exists
-
-    - name: Stop all services before getting SSL
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        state: absent
-      when: not cert_exists.stat.exists
-
-    - name: Wait for port 80 to be free
-      wait_for:
-        port: 80
-        state: stopped
-        timeout: 30
-      when: not cert_exists.stat.exists
-
-    - name: Get SSL certificate
-      command: >
-        certbot certonly --standalone
-        -d {{ domain_name }}
-        --email {{ email }}
-        --agree-tos
-        --non-interactive
-        --preferred-challenges http
-      when: not cert_exists.stat.exists
-
-    - name: Wait after certificate acquisition
-      wait_for:
-        timeout: 10
-      when: not cert_exists.stat.exists
-
-    - name: Start services with SSL
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        state: present
-      when: not cert_exists.stat.exists
 
     - name: Create certbot renewal cron job
       cron:

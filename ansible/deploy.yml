@@ -115,7 +115,8 @@
           community.docker.docker_compose_v2:
             project_src: "{{ app_dir }}"
             files: ["docker-compose.prod.yml"]
-            pull: true
+            pull: "always"
+            state: present
 
         - name: Start MongoDB
           community.docker.docker_compose_v2:

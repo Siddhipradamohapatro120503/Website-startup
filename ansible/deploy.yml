@@ -7,6 +7,14 @@
     docker_compose_file: "{{ app_dir }}/docker-compose.prod.yml"
     domain_name: "{{ domain }}"
     email: "{{ certbot_email }}"
+    # Database configuration
+    mongo_user: "{{ mongo_user }}"
+    mongo_password: "{{ mongo_password }}"
+    mongo_port: 27017
+    mongodb_uri: "mongodb://{{ mongo_user }}:{{ mongo_password }}@mongodb:27017/startup_db?authSource=admin"
+    # Payment configuration
+    razorpay_key_id: "{{ vault_razorpay_key_id }}"
+    razorpay_key_secret: "{{ vault_razorpay_key_secret }}"
 
   tasks:
     - name: Install dependencies

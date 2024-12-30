@@ -27,9 +27,16 @@ import {
   Stat,
   StatLabel,
   StatNumber,
+  useToast,
 } from '@chakra-ui/react';
 import { FiCreditCard, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import api from '../../../services/api';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 interface Payment {
   _id: string;
@@ -39,6 +46,7 @@ interface Payment {
   status: 'pending' | 'completed' | 'failed';
   paymentDate: string;
   transactionId: string;
+  orderId?: string;
 }
 
 const formatIndianCurrency = (amount: number): string => {
@@ -61,6 +69,7 @@ const PaymentSection: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   // Color mode values
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -73,7 +82,15 @@ const PaymentSection: React.FC = () => {
 
   useEffect(() => {
     fetchPayments();
+    loadRazorpayScript();
   }, []);
+
+  const loadRazorpayScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+  };
 
   const fetchPayments = async () => {
     try {
@@ -82,6 +99,13 @@ const PaymentSection: React.FC = () => {
       setStats(response.data.stats);
     } catch (error) {
       console.error('Error fetching payments:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch payments',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -121,14 +145,78 @@ const PaymentSection: React.FC = () => {
 
     setLoading(true);
     try {
-      await api.patch(`/payments/${selectedPayment._id}/status`, {
-        status: 'completed'
+      // Create Razorpay order
+      const orderResponse = await api.post('/payments/create-order', {
+        amount: selectedPayment.amount,
+        currency: 'INR',
+        receipt: selectedPayment._id,
+        notes: {
+          serviceId: selectedPayment.serviceId,
+          serviceName: selectedPayment.serviceName,
+        },
       });
 
-      await fetchPayments();
-      onClose();
+      const { order, key } = orderResponse.data;
+
+      // Initialize Razorpay payment
+      const options = {
+        key,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Shreetech',
+        description: `Payment for ${selectedPayment.serviceName}`,
+        order_id: order.id,
+        handler: async (response: any) => {
+          try {
+            // Verify payment
+            await api.post('/payments/verify', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            toast({
+              title: 'Success',
+              description: 'Payment processed successfully',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+            });
+
+            // Refresh payments list
+            await fetchPayments();
+            onClose();
+          } catch (error) {
+            console.error('Payment verification failed:', error);
+            toast({
+              title: 'Error',
+              description: 'Payment verification failed',
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        },
+        prefill: {
+          name: localStorage.getItem('userName'),
+          email: localStorage.getItem('userEmail'),
+        },
+        theme: {
+          color: '#3182CE',
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
       console.error('Error processing payment:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to process payment',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -222,6 +310,7 @@ const PaymentSection: React.FC = () => {
                         colorScheme="blue"
                         size="sm"
                         onClick={() => handlePayment(payment)}
+                        isLoading={loading}
                       >
                         Pay Now
                       </Button>
@@ -252,13 +341,13 @@ const PaymentSection: React.FC = () => {
                 </Text>
               </Box>
               <Divider />
-              <Button 
-                colorScheme="blue" 
-                leftIcon={<FiCreditCard />} 
-                isLoading={loading}
+              <Button
+                colorScheme="blue"
+                leftIcon={<FiCreditCard />}
                 onClick={processPayment}
+                isLoading={loading}
               >
-                Proceed to Payment
+                Pay with Razorpay
               </Button>
             </VStack>
           </ModalBody>

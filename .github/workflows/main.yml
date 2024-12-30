@@ -1,0 +1,83 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install Dependencies
+      run: |
+        npm ci
+        cd server && npm ci
+        
+    - name: Build Frontend
+      run: npm run build
+        
+    - name: Build Backend
+      run: cd server && npm run build
+        
+    - name: Run Tests
+      run: |
+        npm test -- --passWithNoTests
+        cd server && npm test -- --passWithNoTests
+
+    - name: Login to Docker Hub
+      if: github.ref == 'refs/heads/main'
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push Docker images
+      if: github.ref == 'refs/heads/main'
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/startup-frontend:latest -f Dockerfile.frontend .
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/startup-backend:latest -f Dockerfile.backend .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/startup-frontend:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/startup-backend:latest
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Ansible
+      run: |
+        sudo apt update
+        sudo apt install -y ansible
+        
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+        
+    - name: Run Ansible Playbook
+      run: |
+        cd ansible
+        ansible-playbook -i inventory.yml deploy.yml \
+          --extra-vars "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }} \
+                       mongo_user=${{ secrets.MONGO_USER }} \
+                       mongo_password=${{ secrets.MONGO_PASSWORD }} \
+                       server_ip=${{ secrets.SERVER_IP }} \
+                       domain=${{ secrets.DOMAIN_NAME }} \
+                       certbot_email=${{ secrets.CERTBOT_EMAIL }} \
+                       razorpay_key_id=${{ secrets.RAZORPAY_KEY_ID }} \
+                       razorpay_key_secret=${{ secrets.RAZORPAY_KEY_SECRET }}"

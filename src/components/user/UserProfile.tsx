@@ -50,17 +50,44 @@ const UserProfile = () => {
 
   const handleSave = async () => {
     try {
-      // Add API call to update user profile
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      const response = await fetch('http://localhost:5000/api/users/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const data = await response.json();
+      
+      // Update local storage with new user data
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
       setIsEditing(false);
       toast({
-        title: 'Profile updated',
+        title: 'Profile updated successfully',
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
+
+      // Refresh the page to show updated data
+      window.location.reload();
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         title: 'Error updating profile',
+        description: error instanceof Error ? error.message : 'Something went wrong',
         status: 'error',
         duration: 3000,
         isClosable: true,

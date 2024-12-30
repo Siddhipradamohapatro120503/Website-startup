@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Image, SimpleGrid, useColorModeValue, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, Text, useDisclosure, Flex, Spinner, ScaleFade } from '@chakra-ui/react';
+import { Box, Image, SimpleGrid, useColorModeValue, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, Text, useDisclosure, Flex, Spinner, ScaleFade, Skeleton, SkeletonText, Stack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import Navbar from './navigation/Navbar';
 import Footer from './common/Footer';
@@ -85,62 +85,77 @@ const MotionBox = motion(Box);
 
 const LoadingScreen = () => {
   const bgColor = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.600', 'gray.300');
-  const spinnerColor = useColorModeValue('blue.500', 'blue.200');
-  const [loadingText, setLoadingText] = useState('Loading');
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLoadingText((prev) => {
-        if (prev === 'Loading...') return 'Loading';
-        return prev + '.';
-      });
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
-
+  
   return (
-    <Flex
-      position="fixed"
-      top={0}
-      left={0}
-      right={0}
-      bottom={0}
-      bg={bgColor}
-      zIndex={9999}
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <MotionBox
-        animate={{
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        mb={4}
-      >
-        <Spinner
-          thickness="4px"
-          speed="0.65s"
-          emptyColor="gray.200"
-          color={spinnerColor}
-          size="xl"
-        />
-      </MotionBox>
-      <Text
-        color={textColor}
-        fontSize="lg"
-        fontWeight="medium"
-        letterSpacing="wide"
-      >
-        {loadingText}
-      </Text>
-    </Flex>
+    <Box bg={bgColor} minH="100vh">
+      {/* Navbar Skeleton */}
+      <Box mb={8}>
+        <Skeleton height="60px" />
+      </Box>
+
+      {/* Hero Section Skeleton */}
+      <Box mb={16}>
+        <Stack spacing={8}>
+          <Skeleton height="500px" />
+          <Box px={8}>
+            <SkeletonText noOfLines={3} spacing={4} skeletonHeight={4} />
+            <Skeleton height="40px" width="150px" mt={6} />
+          </Box>
+        </Stack>
+      </Box>
+
+      {/* Services Section Skeleton */}
+      <Box mb={16} px={8}>
+        <SkeletonText noOfLines={2} spacing={4} width="60%" mb={8} />
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+          {[...Array(6)].map((_, i) => (
+            <Box key={i} p={6} boxShadow="lg" borderRadius="md">
+              <Skeleton height="60px" width="60px" mb={4} />
+              <SkeletonText noOfLines={3} spacing={4} />
+            </Box>
+          ))}
+        </SimpleGrid>
+      </Box>
+
+      {/* Features Section Skeleton */}
+      <Box mb={16} px={8}>
+        <SkeletonText noOfLines={2} spacing={4} width="60%" mb={8} />
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
+          {[...Array(4)].map((_, i) => (
+            <Box key={i}>
+              <Skeleton height="200px" mb={4} />
+              <SkeletonText noOfLines={3} spacing={4} />
+            </Box>
+          ))}
+        </SimpleGrid>
+      </Box>
+
+      {/* Testimonials Section Skeleton */}
+      <Box mb={16} px={8}>
+        <SkeletonText noOfLines={2} spacing={4} width="60%" mb={8} />
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+          {[...Array(3)].map((_, i) => (
+            <Box key={i} p={6} boxShadow="lg" borderRadius="md">
+              <Skeleton height="50px" width="50px" borderRadius="full" mb={4} />
+              <SkeletonText noOfLines={4} spacing={4} />
+            </Box>
+          ))}
+        </SimpleGrid>
+      </Box>
+
+      {/* Contact Section Skeleton */}
+      <Box mb={16} px={8}>
+        <Stack spacing={8} alignItems="center">
+          <SkeletonText noOfLines={2} spacing={4} width="60%" textAlign="center" />
+          <Skeleton height="50px" width="200px" />
+        </Stack>
+      </Box>
+
+      {/* Footer Skeleton */}
+      <Box>
+        <Skeleton height="200px" />
+      </Box>
+    </Box>
   );
 };
 

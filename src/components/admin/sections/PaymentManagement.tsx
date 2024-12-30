@@ -28,6 +28,7 @@ import {
   StatLabel,
   StatNumber,
   StatGroup,
+  Select,
 } from '@chakra-ui/react';
 import { FiDollarSign, FiClock, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import api from '../../../services/api';
@@ -60,26 +61,33 @@ interface Payment {
   transactionId: string;
 }
 
+interface PaymentStats {
+  totalPayments: number;
+  pendingAmount: number;
+  completedAmount: number;
+  failedAmount: number;
+}
+
 const PaymentManagement: React.FC = () => {
   const [services, setServices] = useState<RegisteredService[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [selectedService, setSelectedService] = useState<RegisteredService | null>(null);
   const [amount, setAmount] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
-
-  // Payment statistics
-  const [stats, setStats] = useState({
+  const [timeFilter, setTimeFilter] = useState<string>('all');
+  const [stats, setStats] = useState<PaymentStats>({
     totalPayments: 0,
     pendingAmount: 0,
     completedAmount: 0,
     failedAmount: 0,
   });
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   useEffect(() => {
     fetchServices();
     fetchPayments();
+    fetchPaymentStats(timeFilter);
   }, []);
 
   useEffect(() => {
@@ -115,6 +123,15 @@ const PaymentManagement: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+    }
+  };
+
+  const fetchPaymentStats = async (filter: string) => {
+    try {
+      const response = await api.get(`/payments/stats?timeFilter=${filter}`);
+      setStats(response.data.stats);
+    } catch (error) {
+      console.error('Error fetching payment stats:', error);
     }
   };
 
@@ -210,6 +227,19 @@ const PaymentManagement: React.FC = () => {
 
       {/* Payment Statistics */}
       <Box mb={6} p={4} borderWidth="1px" borderRadius="lg">
+        <HStack mb={4} justify="space-between" align="center">
+          <Text fontSize="lg" fontWeight="medium">Payment Statistics</Text>
+          <Select
+            width="200px"
+            value={timeFilter}
+            onChange={(e) => setTimeFilter(e.target.value)}
+          >
+            <option value="all">All Time</option>
+            <option value="24h">Last 24 Hours</option>
+            <option value="7d">Last 7 Days</option>
+            <option value="30d">Last 30 Days</option>
+          </Select>
+        </HStack>
         <StatGroup>
           <Stat>
             <StatLabel>Total Payments</StatLabel>

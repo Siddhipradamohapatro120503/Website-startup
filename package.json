@@ -25,6 +25,7 @@
     "gsap": "^3.12.2",
     "locomotive-scroll": "^4.1.4",
     "mongoose": "^7.0.3",
+    "razorpay": "^2.9.5",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
@@ -41,6 +42,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "server": "cd server && npm run dev",
+    "dev": "concurrently \"npm start\" \"npm run server\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -65,6 +68,7 @@
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "concurrently": "^9.1.1"
   }
 }

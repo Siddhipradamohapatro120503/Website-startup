@@ -1,0 +1,130 @@
+---
+- name: Deploy Application
+  hosts: production
+  become: yes
+  vars:
+    app_dir: /opt/startup-app
+    docker_compose_file: "{{ app_dir }}/docker-compose.prod.yml"
+    env_file: "{{ app_dir }}/.env"
+    domain_name: "{{ domain }}"
+    email: "{{ certbot_email }}"
+    razorpay_key_id: "{{ vault_razorpay_key_id }}"
+    razorpay_key_secret: "{{ vault_razorpay_key_secret }}"
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name: 
+          - docker.io
+          - docker-compose
+          - python3-pip
+          - certbot
+          - python3-certbot-nginx
+        state: present
+        update_cache: yes
+
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create nginx configuration directory
+      file:
+        path: "{{ app_dir }}/nginx"
+        state: directory
+        mode: '0755'
+
+    - name: Create letsencrypt directory
+      file:
+        path: "{{ app_dir }}/certbot"
+        state: directory
+        mode: '0755'
+
+    - name: Copy nginx configuration
+      template:
+        src: templates/nginx.conf.j2
+        dest: "{{ app_dir }}/nginx/nginx.conf"
+        mode: '0644'
+
+    - name: Copy docker-compose file
+      template:
+        src: templates/docker-compose.prod.yml.j2
+        dest: "{{ docker_compose_file }}"
+        mode: '0644'
+
+    - name: Copy environment file
+      template:
+        src: templates/.env.j2
+        dest: "{{ env_file }}"
+        mode: '0644'
+
+    - name: Stop existing services
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        state: absent
+
+    - name: Log into DockerHub
+      docker_login:
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_token }}"
+
+    - name: Pull latest images
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        pull: yes
+        state: present
+
+    - name: Start services
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        state: present
+
+    - name: Wait for nginx to start
+      wait_for:
+        port: 80
+        timeout: 60
+
+    - name: Check if certificate exists
+      stat:
+        path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+      register: cert_exists
+
+    - name: Stop nginx temporarily
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        services: ["frontend"]
+        state: stopped
+      when: not cert_exists.stat.exists
+
+    - name: Get SSL certificate
+      command: >
+        certbot certonly --standalone
+        -d {{ domain_name }}
+        --email {{ email }}
+        --agree-tos
+        --non-interactive
+        --preferred-challenges http
+      when: not cert_exists.stat.exists
+
+    - name: Create certbot renewal cron job
+      cron:
+        name: "Certbot Renewal"
+        minute: "0"
+        hour: "0"
+        day: "1"
+        job: "docker compose -f {{ docker_compose_file }} down && certbot renew --quiet && docker compose -f {{ docker_compose_file }} up -d"
+
+    - name: Restart services with SSL
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        state: present
+        restarted: yes

@@ -2,67 +2,84 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IPayment extends Document {
   serviceId: mongoose.Types.ObjectId;
-  amount: number;
-  status: 'pending' | 'completed' | 'failed';
-  paymentDate: Date;
-  transactionId?: string;
-  paymentMethod?: string;
-  userEmail: string;
   serviceName: string;
+  userEmail: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed';
+  paymentMethod: string;
+  paymentDate?: Date;
   description?: string;
-  metadata?: {
-    [key: string]: any;
-  };
+  transactionId: string;
+  orderId?: string;
+  paymentId?: string;
+  receipt?: string;
+  notes?: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const PaymentSchema = new Schema<IPayment>(
+const PaymentSchema: Schema = new Schema(
   {
     serviceId: {
       type: Schema.Types.ObjectId,
       ref: 'RegisteredService',
-      required: true
+      required: true,
+    },
+    serviceName: {
+      type: String,
+      required: true,
+    },
+    userEmail: {
+      type: String,
+      required: true,
     },
     amount: {
       type: Number,
       required: true,
-      min: 0
+    },
+    currency: {
+      type: String,
+      default: 'INR',
     },
     status: {
       type: String,
       enum: ['pending', 'completed', 'failed'],
-      default: 'pending'
+      default: 'pending',
+    },
+    paymentMethod: {
+      type: String,
+      default: 'razorpay',
     },
     paymentDate: {
       type: Date,
-      default: Date.now
+    },
+    description: {
+      type: String,
     },
     transactionId: {
       type: String,
+      required: true,
+      unique: true,
+    },
+    orderId: {
+      type: String,
       sparse: true,
-      unique: true
     },
-    paymentMethod: {
-      type: String
-    },
-    userEmail: {
+    paymentId: {
       type: String,
-      required: true
+      sparse: true,
     },
-    serviceName: {
+    receipt: {
       type: String,
-      required: true
     },
-    description: {
-      type: String
+    notes: {
+      type: Map,
+      of: String,
     },
-    metadata: {
-      type: Schema.Types.Mixed
-    }
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 

@@ -108,6 +108,7 @@ const WorkflowSection: React.FC = () => {
   const headingColor = useColorModeValue('#1A202C', '#FFFFFF');
   const iconColor = useColorModeValue('#3182CE', '#90CDF4');
   const lineColor = useColorModeValue('#E2E8F0', '#2D3748');
+  const hoverTextColor = useColorModeValue('#1A202C', '#FFFFFF');
   
   // Card colors
   const cardBgBase = useColorModeValue('#F7FAFC', '#2D3748');
@@ -238,13 +239,13 @@ const WorkflowSection: React.FC = () => {
                 </MotionCircle>
                 <Heading 
                   size="md" 
-                  color={hoveredIndex === index ? 'white' : headingColor} 
+                  color={hoveredIndex === index ? hoverTextColor : headingColor} 
                   textAlign="center"
                 >
                   {step.title}
                 </Heading>
                 <Text 
-                  color={hoveredIndex === index ? 'white' : textColor} 
+                  color={hoveredIndex === index ? hoverTextColor : textColor} 
                   textAlign="center"
                 >
                   {step.description}
@@ -267,9 +268,9 @@ const WorkflowSection: React.FC = () => {
                             key={detailIndex}
                             display="flex"
                             alignItems="center"
-                            color="white"
+                            color={hoverTextColor}
                           >
-                            <ListIcon as={FiChevronRight} color="white" />
+                            <ListIcon as={FiChevronRight} color={hoverTextColor} />
                             <Text fontSize="sm">{detail}</Text>
                           </ListItem>
                         ))}

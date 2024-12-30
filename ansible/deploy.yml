@@ -119,7 +119,7 @@
     - name: Pull latest images
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
-        pull: yes
+        pull: "always"
         state: present
 
     - name: Start services

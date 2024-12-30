@@ -171,6 +171,39 @@
         - "mongodb_data"
       ignore_errors: yes
 
+    - name: Start MongoDB first
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
+        services:
+          - mongodb
+        state: present
+        build: "never"
+
+    - name: Wait for MongoDB to be ready
+      wait_for:
+        port: 27017
+        timeout: 60
+        delay: 10
+
+    - name: Start remaining services
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
+        services:
+          - backend
+          - frontend
+        state: present
+        build: "never"
+      register: compose_result
+
+    - name: Wait for services to be healthy
+      wait_for:
+        timeout: 30
+      when: compose_result is success
+
     - name: Check if certificate exists
       stat:
         path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
@@ -178,6 +211,22 @@
 
     - name: Get SSL certificate when needed
       block:
+        - name: Stop frontend container for certificate acquisition
+          community.docker.docker_compose_v2:
+            project_src: "{{ app_dir }}"
+            files:
+              - "docker-compose.prod.yml"
+            services: ["frontend"]
+            state: absent
+          when: not cert_exists.stat.exists
+
+        - name: Wait for port 80 to be free
+          wait_for:
+            port: 80
+            state: stopped
+            timeout: 30
+          when: not cert_exists.stat.exists
+
         - name: Get SSL certificate
           command: >
             certbot certonly --standalone
@@ -186,33 +235,23 @@
             --agree-tos
             --non-interactive
             --preferred-challenges http
-          register: certbot_result
+          when: not cert_exists.stat.exists
 
         - name: Wait after certificate acquisition
           wait_for:
             timeout: 10
+          when: not cert_exists.stat.exists
 
+        - name: Restart frontend with SSL
+          community.docker.docker_compose_v2:
+            project_src: "{{ app_dir }}"
+            files:
+              - "docker-compose.prod.yml"
+            services: ["frontend"]
+            state: present
+          when: not cert_exists.stat.exists
       when: not cert_exists.stat.exists
       ignore_errors: yes
-
-    - name: Start services
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        state: present
-        build: "never"
-      register: compose_result
-
-    - name: Debug compose result
-      debug:
-        var: compose_result
-      when: compose_result is defined
-
-    - name: Wait for services to be healthy
-      wait_for:
-        timeout: 30
-      when: compose_result is success
 
     - name: Create certbot renewal cron job
       cron:

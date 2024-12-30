@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   VStack,
@@ -80,19 +80,7 @@ const PaymentSection: React.FC = () => {
   const tableBorderColor = useColorModeValue('gray.200', 'gray.600');
   const hoverBg = useColorModeValue('gray.50', 'gray.700');
 
-  useEffect(() => {
-    fetchPayments();
-    loadRazorpayScript();
-  }, []);
-
-  const loadRazorpayScript = () => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.async = true;
-    document.body.appendChild(script);
-  };
-
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       const response = await api.get('/payments/user');
       setPayments(response.data.payments);
@@ -107,7 +95,19 @@ const PaymentSection: React.FC = () => {
         isClosable: true,
       });
     }
-  };
+  }, [toast]);
+
+  const loadRazorpayScript = useCallback(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    fetchPayments();
+    loadRazorpayScript();
+  }, [fetchPayments, loadRazorpayScript]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -145,7 +145,6 @@ const PaymentSection: React.FC = () => {
 
     setLoading(true);
     try {
-      // Create Razorpay order
       const orderResponse = await api.post('/payments/create-order', {
         amount: selectedPayment.amount,
         currency: 'INR',
@@ -158,7 +157,6 @@ const PaymentSection: React.FC = () => {
 
       const { order, key } = orderResponse.data;
 
-      // Initialize Razorpay payment
       const options = {
         key,
         amount: order.amount,
@@ -168,7 +166,6 @@ const PaymentSection: React.FC = () => {
         order_id: order.id,
         handler: async (response: any) => {
           try {
-            // Verify payment
             await api.post('/payments/verify', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -183,7 +180,6 @@ const PaymentSection: React.FC = () => {
               isClosable: true,
             });
 
-            // Refresh payments list
             await fetchPayments();
             onClose();
           } catch (error) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Text,
@@ -84,17 +84,7 @@ const PaymentManagement: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
-  useEffect(() => {
-    fetchServices();
-    fetchPayments();
-    fetchPaymentStats(timeFilter);
-  }, []);
-
-  useEffect(() => {
-    calculateStats();
-  }, [payments]);
-
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     try {
       const response = await api.get('/registered-services');
       setServices(response.data);
@@ -108,9 +98,9 @@ const PaymentManagement: React.FC = () => {
         isClosable: true,
       });
     }
-  };
+  }, []);
 
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       const response = await api.get('/payments');
       setPayments(response.data);
@@ -124,18 +114,18 @@ const PaymentManagement: React.FC = () => {
         isClosable: true,
       });
     }
-  };
+  }, []);
 
-  const fetchPaymentStats = async (filter: string) => {
+  const fetchPaymentStats = useCallback(async (filter: string) => {
     try {
       const response = await api.get(`/payments/stats?timeFilter=${filter}`);
       setStats(response.data.stats);
     } catch (error) {
       console.error('Error fetching payment stats:', error);
     }
-  };
+  }, []);
 
-  const calculateStats = () => {
+  const calculateStats = useCallback(() => {
     const stats = payments.reduce(
       (acc, payment) => {
         acc.totalPayments += payment.amount;
@@ -151,7 +141,17 @@ const PaymentManagement: React.FC = () => {
       { totalPayments: 0, pendingAmount: 0, completedAmount: 0, failedAmount: 0 }
     );
     setStats(stats);
-  };
+  }, [payments]);
+
+  useEffect(() => {
+    fetchServices();
+    fetchPayments();
+    fetchPaymentStats(timeFilter);
+  }, [fetchServices, fetchPayments, fetchPaymentStats, timeFilter]);
+
+  useEffect(() => {
+    calculateStats();
+  }, [calculateStats, payments]);
 
   const handleInitiatePayment = (service: RegisteredService) => {
     setSelectedService(service);

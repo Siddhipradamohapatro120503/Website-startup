@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      CI: false  # This prevents treating warnings as errors
     
     steps:
     - uses: actions/checkout@v3

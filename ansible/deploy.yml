@@ -149,7 +149,7 @@
         files:
           - "docker-compose.prod.yml"
         state: present
-        build: no
+        build: "never"
       register: compose_result
       ignore_errors: yes
 
@@ -173,13 +173,19 @@
         path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
       register: cert_exists
 
-    - name: Stop nginx temporarily
+    - name: Stop all services before getting SSL
       community.docker.docker_compose_v2:
         project_src: "{{ app_dir }}"
         files:
           - "docker-compose.prod.yml"
-        services: ["frontend"]
+        state: absent
+      when: not cert_exists.stat.exists
+
+    - name: Wait for port 80 to be free
+      wait_for:
+        port: 80
         state: stopped
+        timeout: 30
       when: not cert_exists.stat.exists
 
     - name: Get SSL certificate
@@ -192,6 +198,19 @@
         --preferred-challenges http
       when: not cert_exists.stat.exists
 
+    - name: Wait after certificate acquisition
+      wait_for:
+        timeout: 10
+      when: not cert_exists.stat.exists
+
+    - name: Start services with SSL
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
+        state: present
+      when: not cert_exists.stat.exists
+
     - name: Create certbot renewal cron job
       cron:
         name: "Certbot Renewal"
@@ -199,11 +218,3 @@
         hour: "0"
         day: "1"
         job: "docker compose -f {{ docker_compose_file }} down && certbot renew --quiet && docker compose -f {{ docker_compose_file }} up -d"
-
-    - name: Restart services with SSL
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_dir }}"
-        files:
-          - "docker-compose.prod.yml"
-        state: present
-        restarted: yes

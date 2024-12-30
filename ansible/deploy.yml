@@ -136,19 +136,22 @@
       ignore_errors: yes
       when: all_containers.stdout != ""
 
-    - name: Find and kill process using port 80 (Windows)
-      win_shell: |
-        $processIds = @()
-        $processIds += Get-NetTCPConnection -LocalPort 80 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess
-        foreach ($pid in $processIds) {
-            try {
-                Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
-                Write-Host "Stopped process with ID: $pid"
-            } catch {
-                Write-Host "Failed to stop process with ID: $pid"
-            }
-        }
+    - name: Install lsof if not present
+      apt:
+        name: lsof
+        state: present
+      become: yes
       ignore_errors: yes
+
+    - name: Find process using port 80
+      shell: lsof -ti:80
+      register: port_80_pid
+      ignore_errors: yes
+
+    - name: Kill process using port 80 if found
+      shell: "kill -9 {{ port_80_pid.stdout }}"
+      ignore_errors: yes
+      when: port_80_pid.stdout != ""
 
     - name: Pause for processes to stop
       pause:
@@ -179,9 +182,7 @@
         build: "never"
 
     - name: Wait for MongoDB container to be healthy
-      shell: >
-        docker inspect --format='{{.State.Health.Status}}'
-        $(docker-compose -f {{ docker_compose_file }} ps -q mongodb)
+      shell: docker inspect $(docker ps -q --filter name=mongodb) --format="{% raw %}{{.State.Health.Status}}{% endraw %}"
       register: mongodb_health
       until: mongodb_health.stdout == "healthy"
       retries: 30
@@ -201,9 +202,7 @@
       register: compose_result
 
     - name: Wait for backend to be healthy
-      shell: >
-        docker inspect --format='{{.State.Health.Status}}'
-        $(docker-compose -f {{ docker_compose_file }} ps -q backend)
+      shell: docker inspect $(docker ps -q --filter name=backend) --format="{% raw %}{{.State.Health.Status}}{% endraw %}"
       register: backend_health
       until: backend_health.stdout == "healthy"
       retries: 30
@@ -212,52 +211,80 @@
 
     - name: Check if certificate exists
       stat:
-        path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
-      register: cert_exists
+        path: /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
+      register: cert_file
 
-    - name: Get SSL certificate when needed
-      block:
-        - name: Stop frontend container for certificate acquisition
-          community.docker.docker_compose_v2:
-            project_src: "{{ app_dir }}"
-            files:
-              - "docker-compose.prod.yml"
-            services: ["frontend"]
-            state: absent
-          when: not cert_exists.stat.exists
+    - name: Stop frontend container for certificate acquisition
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
+        services:
+          - frontend
+        state: stopped
+      when: not cert_file.stat.exists
 
-        - name: Wait for port 80 to be free
-          wait_for:
-            port: 80
-            state: stopped
-            timeout: 30
-          when: not cert_exists.stat.exists
+    - name: Wait for port 80 to be free
+      wait_for:
+        port: 80
+        state: stopped
+        timeout: 30
+      when: not cert_file.stat.exists
 
-        - name: Get SSL certificate
-          command: >
-            certbot certonly --standalone
-            -d {{ domain_name }}
-            --email {{ email }}
-            --agree-tos
-            --non-interactive
-            --preferred-challenges http
-          when: not cert_exists.stat.exists
+    - name: Install certbot
+      apt:
+        name: certbot
+        state: present
+      become: yes
+      when: not cert_file.stat.exists
 
-        - name: Wait after certificate acquisition
-          wait_for:
-            timeout: 10
-          when: not cert_exists.stat.exists
+    - name: Create webroot directory
+      file:
+        path: /var/www/certbot
+        state: directory
+        mode: '0755'
+      become: yes
+      when: not cert_file.stat.exists
 
-        - name: Restart frontend with SSL
-          community.docker.docker_compose_v2:
-            project_src: "{{ app_dir }}"
-            files:
-              - "docker-compose.prod.yml"
-            services: ["frontend"]
-            state: present
-          when: not cert_exists.stat.exists
-      when: not cert_exists.stat.exists
+    - name: Get SSL certificate
+      shell: >
+        certbot certonly --webroot 
+        -w /var/www/certbot 
+        -d {{ domain_name }}
+        --email {{ email }}
+        --agree-tos
+        --non-interactive
+        --preferred-challenges http
+      become: yes
+      when: not cert_file.stat.exists
+      register: certbot_result
       ignore_errors: yes
+
+    - name: Display certbot logs if failed
+      shell: cat /var/log/letsencrypt/letsencrypt.log
+      when: certbot_result.rc is defined and certbot_result.rc != 0
+      register: certbot_logs
+      ignore_errors: yes
+
+    - name: Show certbot logs
+      debug:
+        var: certbot_logs.stdout_lines
+      when: certbot_logs is defined
+
+    - name: Wait after certificate acquisition
+      pause:
+        seconds: 10
+      when: not cert_file.stat.exists
+
+    - name: Restart frontend with SSL
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - "docker-compose.prod.yml"
+        services:
+          - frontend
+        state: present
+        build: "never"
 
     - name: Create certbot renewal cron job
       cron:

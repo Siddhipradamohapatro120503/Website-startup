@@ -63,15 +63,20 @@ const UserDashboard: React.FC = () => {
   };
 
   return (
-    <Container maxW="container.xl" py={8}>
+    <Container maxW="container.xl" py={{ base: 4, md: 8 }}>
       {/* Header with Theme Toggle and Logout */}
-      <Flex mb={6} align="center">
-        <Heading size="lg">Dashboard</Heading>
+      <Flex 
+        mb={{ base: 4, md: 6 }} 
+        align="center" 
+        direction={{ base: 'column', sm: 'row' }}
+        gap={{ base: 4, sm: 0 }}
+      >
+        <Heading size={{ base: "md", lg: "lg" }}>Dashboard</Heading>
         <Spacer />
-        <HStack spacing={4}>
+        <HStack spacing={{ base: 2, md: 4 }}>
           <Button
             onClick={toggleColorMode}
-            size="sm"
+            size={{ base: "xs", md: "sm" }}
             variant="ghost"
             leftIcon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
           >
@@ -81,7 +86,7 @@ const UserDashboard: React.FC = () => {
             onClick={handleLogout}
             colorScheme="red"
             variant="outline"
-            size="sm"
+            size={{ base: "xs", md: "sm" }}
             leftIcon={<FiLogOut />}
           >
             Logout
@@ -91,10 +96,10 @@ const UserDashboard: React.FC = () => {
 
       <Grid
         templateColumns={{ base: '1fr', lg: '1fr 2fr' }}
-        gap={8}
+        gap={{ base: 4, md: 8 }}
       >
         {/* Left Column - User Profile */}
-        <VStack spacing={8}>
+        <VStack spacing={{ base: 4, md: 8 }}>
           <UserProfile />
           
           {/* Quick Stats */}
@@ -102,18 +107,21 @@ const UserDashboard: React.FC = () => {
             w="100%"
             bg={bgColor}
             borderRadius="lg"
-            p={6}
+            p={{ base: 4, md: 6 }}
             borderWidth={1}
             borderColor={borderColor}
           >
-            <VStack spacing={4} align="stretch">
-              <Heading size="md">Overview</Heading>
+            <VStack spacing={{ base: 3, md: 4 }} align="stretch">
+              <Heading size={{ base: "sm", md: "md" }}>Overview</Heading>
               {loading ? (
                 <Box textAlign="center" py={4}>
                   <Spinner size="lg" />
                 </Box>
               ) : (
-                <Grid templateColumns="1fr 1fr" gap={4}>
+                <Grid 
+                  templateColumns={{ base: "1fr", sm: "1fr 1fr" }} 
+                  gap={{ base: 3, md: 4 }}
+                >
                   <Stat>
                     <StatLabel>Active Services</StatLabel>
                     <StatNumber>{activeServices}</StatNumber>
@@ -141,17 +149,17 @@ const UserDashboard: React.FC = () => {
         </VStack>
 
         {/* Right Column - Services and Payments */}
-        <Box>
+        <Box w="100%">
           <Tabs variant="enclosed">
             <TabList>
-              <Tab>
-                <HStack>
+              <Tab fontSize={{ base: "sm", md: "md" }}>
+                <HStack spacing={{ base: 1, md: 2 }}>
                   <Icon as={FiList} />
                   <Text>Services</Text>
                 </HStack>
               </Tab>
-              <Tab>
-                <HStack>
+              <Tab fontSize={{ base: "sm", md: "md" }}>
+                <HStack spacing={{ base: 1, md: 2 }}>
                   <Icon as={FiDollarSign} />
                   <Text>Payments</Text>
                 </HStack>
@@ -159,8 +167,8 @@ const UserDashboard: React.FC = () => {
             </TabList>
 
             <TabPanels>
-              <TabPanel>
-                <VStack spacing={8} align="stretch">
+              <TabPanel p={{ base: 2, md: 4 }}>
+                <VStack spacing={{ base: 4, md: 8 }} align="stretch">
                   <Box>
                     <RegisteredServices />
                   </Box>

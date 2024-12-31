@@ -142,7 +142,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => 
           </Container>
         </Box>
       </Box>
-      <BrandsMarquee />
+      {/* <BrandsMarquee /> */}
       <WorkflowSection />
       <StatsSection />
       <TrustIndicatorsSection />

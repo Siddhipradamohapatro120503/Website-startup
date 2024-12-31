@@ -109,6 +109,7 @@ const WorkflowSection: React.FC = () => {
   const iconColor = useColorModeValue('#3182CE', '#90CDF4');
   const lineColor = useColorModeValue('#E2E8F0', '#2D3748');
   const hoverTextColor = useColorModeValue('#1A202C', '#FFFFFF');
+  const iconHoverColor = useColorModeValue('#1A202C', '#FFFFFF');
   
   // Card colors
   const cardBgBase = useColorModeValue('#F7FAFC', '#2D3748');
@@ -234,7 +235,7 @@ const WorkflowSection: React.FC = () => {
                     as={step.icon} 
                     w={10} 
                     h={10} 
-                    color={hoveredIndex === index ? 'white' : iconColor}
+                    color={hoveredIndex === index ? iconHoverColor : iconColor}
                   />
                 </MotionCircle>
                 <Heading 

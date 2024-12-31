@@ -132,7 +132,7 @@ const TrustIndicatorsSection: React.FC = () => {
             ))}
           </SimpleGrid>
 
-          <Box w="full">
+          {/* <Box w="full">
             <Text
               textAlign="center"
               fontSize="xl"
@@ -169,7 +169,7 @@ const TrustIndicatorsSection: React.FC = () => {
                 </MotionBox>
               ))}
             </Flex>
-          </Box>
+          </Box> */}
         </VStack>
       </Container>
     </Box>

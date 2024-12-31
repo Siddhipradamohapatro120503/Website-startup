@@ -32,7 +32,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/custom-ai-solutions.pdf',
+        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
       },
       {
         name: 'Computer Vision',
@@ -46,7 +46,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/computer-vision.pdf',
+        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
       },
       {
         name: 'Natural Language Processing',
@@ -60,7 +60,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/natural-language-processing.pdf',
+        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
       },
       {
         name: 'Predictive Analytics',
@@ -74,7 +74,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/predictive-analytics.pdf',
+        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
       },
     ],
   },
@@ -94,7 +94,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/video-editing.pdf',
+        brochureUrl: '/Brochures/Graphic Design and Video editing services Brochure.pdf',
       },
       {
         name: 'Graphic Design',
@@ -108,7 +108,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/graphic-design.pdf',
+        brochureUrl: '/Brochures/Graphic Design and Video editing services Brochure.pdf',
       },
     ],
   },
@@ -128,7 +128,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/social-media-management.pdf',
+        brochureUrl: '/Brochures/Social Media  services Brochure.pdf',
       },
       {
         name: 'Social Media Marketing',
@@ -148,7 +148,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/social-media-marketing.pdf',
+        brochureUrl: '/Brochures/Social Media  services Brochure.pdf',
       },
     ],
   },
@@ -168,7 +168,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/web-development.pdf',
+        brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf',
       },
       {
         name: 'Web App Design',
@@ -182,7 +182,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/web-app-design.pdf',
+        brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf',
       },
       {
         name: 'UI/UX Design',
@@ -228,7 +228,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'design@shreetech.org'
         },
-        brochureUrl: '/brochures/ui-ux-design.pdf'
+        brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf'
       },
     ],
   },
@@ -248,7 +248,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/infrastructure-setup.pdf',
+        brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
       },
       {
         name: 'Cloud Solutions',
@@ -262,7 +262,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/cloud-solutions.pdf',
+        brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
       },
       {
         name: 'DevOps Solutions',
@@ -276,7 +276,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: '+1 (234) 567-8900',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/brochures/devops-solutions.pdf',
+        brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
       },
     ],
   },

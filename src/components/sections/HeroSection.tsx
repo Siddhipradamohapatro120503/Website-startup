@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Container, Flex, Heading, Text, Stack, Button, Icon, useColorModeValue, IconButton, HStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight, FiDownload } from 'react-icons/fi';
 import { FaTwitter, FaLinkedin, FaInstagram, FaFacebook } from 'react-icons/fa';
 import HeroCarousel from './HeroCarousel';
 import BrandsMarquee from './BrandsMarquee';
@@ -83,7 +83,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => 
                   <HStack spacing={4} pt={2}>
                     <IconButton
                       as="a"
-                      href="https://twitter.com/youraccount"
+                      href="https://x.com/technologi51361"
                       aria-label="Twitter"
                       icon={<FaTwitter />}
                       size="md"
@@ -93,7 +93,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => 
                     />
                     <IconButton
                       as="a"
-                      href="https://linkedin.com/company/youraccount"
+                      href="https://www.linkedin.com/in/shree-technologies-b52b53343/"
                       aria-label="LinkedIn"
                       icon={<FaLinkedin />}
                       size="md"
@@ -103,7 +103,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => 
                     />
                     <IconButton
                       as="a"
-                      href="https://instagram.com/youraccount"
+                      href="https://www.instagram.com/shreetech_org/"
                       aria-label="Instagram"
                       icon={<FaInstagram />}
                       size="md"
@@ -134,6 +134,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => 
                       }}
                     >
                       Explore Services
+                    </Button>
+                    <Button
+                      as="a"
+                      href="/Brochures/Company Brochure.pdf"
+                      target="_blank"
+                      size="lg"
+                      colorScheme="purple"
+                      rightIcon={<Icon as={FiDownload} />}
+                      _hover={{
+                        transform: 'translateY(-2px)',
+                        boxShadow: 'lg',
+                      }}
+                    >
+                      Download Brochure
                     </Button>
                   </Stack>
                 </Stack>

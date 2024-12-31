@@ -63,35 +63,59 @@ const UserDashboard: React.FC = () => {
   };
 
   return (
-    <Container maxW="container.xl" py={{ base: 4, md: 8 }}>
+    <Container 
+      maxW="container.xl" 
+      py={{ base: 4, md: 8 }}
+      px={{ base: 2, sm: 4, md: 6 }}
+    >
       {/* Header with Theme Toggle and Logout */}
       <Flex 
         mb={{ base: 4, md: 6 }} 
-        align="center" 
-        direction={{ base: 'column', sm: 'row' }}
-        gap={{ base: 4, sm: 0 }}
+        direction="row"
+        align="center"
+        justify="space-between"
+        w="full"
+        flexWrap={{ base: "wrap", sm: "nowrap" }}
+        gap={2}
+        pr={{ base: 0, sm: 2, md: 4 }}
       >
-        <Heading size={{ base: "md", lg: "lg" }}>Dashboard</Heading>
-        <Spacer />
-        <HStack spacing={{ base: 2, md: 4 }}>
+        <Heading 
+          size={{ base: "md", lg: "lg" }}
+          textAlign="left"
+          mb={{ base: 0, sm: 0 }}
+          flex="1"
+        >
+          Dashboard
+        </Heading>
+        
+        <Flex 
+          gap={2}
+          justify="flex-end"
+          ml="auto"
+          minW={{ base: "auto", sm: "180px" }}
+        >
           <Button
             onClick={toggleColorMode}
-            size={{ base: "xs", md: "sm" }}
+            size="sm"
             variant="ghost"
             leftIcon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
+            fontSize="sm"
+            minW={{ base: "70px", sm: "80px" }}
           >
-            {colorMode === 'light' ? 'Dark Mode' : 'Light Mode'}
+            {colorMode === 'light' ? 'Dark' : 'Light'}
           </Button>
           <Button
             onClick={handleLogout}
             colorScheme="red"
             variant="outline"
-            size={{ base: "xs", md: "sm" }}
+            size="sm"
             leftIcon={<FiLogOut />}
+            fontSize="sm"
+            minW={{ base: "70px", sm: "80px" }}
           >
             Logout
           </Button>
-        </HStack>
+        </Flex>
       </Flex>
 
       <Grid
@@ -99,7 +123,7 @@ const UserDashboard: React.FC = () => {
         gap={{ base: 4, md: 8 }}
       >
         {/* Left Column - User Profile */}
-        <VStack spacing={{ base: 4, md: 8 }}>
+        <VStack spacing={{ base: 3, md: 8 }}>
           <UserProfile />
           
           {/* Quick Stats */}
@@ -107,37 +131,37 @@ const UserDashboard: React.FC = () => {
             w="100%"
             bg={bgColor}
             borderRadius="lg"
-            p={{ base: 4, md: 6 }}
+            p={{ base: 3, md: 6 }}
             borderWidth={1}
             borderColor={borderColor}
           >
-            <VStack spacing={{ base: 3, md: 4 }} align="stretch">
+            <VStack spacing={{ base: 2, md: 4 }} align="stretch">
               <Heading size={{ base: "sm", md: "md" }}>Overview</Heading>
               {loading ? (
-                <Box textAlign="center" py={4}>
-                  <Spinner size="lg" />
+                <Box textAlign="center" py={{ base: 2, md: 4 }}>
+                  <Spinner size={{ base: "md", md: "lg" }} />
                 </Box>
               ) : (
                 <Grid 
                   templateColumns={{ base: "1fr", sm: "1fr 1fr" }} 
                   gap={{ base: 3, md: 4 }}
                 >
-                  <Stat>
-                    <StatLabel>Active Services</StatLabel>
-                    <StatNumber>{activeServices}</StatNumber>
-                    <StatHelpText>
-                      <HStack>
-                        <Icon as={FiActivity} color="green.500" />
+                  <Stat size={{ base: "sm", md: "md" }}>
+                    <StatLabel fontSize={{ base: "xs", md: "sm" }}>Active Services</StatLabel>
+                    <StatNumber fontSize={{ base: "lg", md: "2xl" }}>{activeServices}</StatNumber>
+                    <StatHelpText fontSize={{ base: "xs", md: "sm" }}>
+                      <HStack spacing={{ base: 1, md: 2 }}>
+                        <Icon as={FiActivity} color="green.500" boxSize={{ base: 3, md: 4 }} />
                         <Text>Currently Active</Text>
                       </HStack>
                     </StatHelpText>
                   </Stat>
-                  <Stat>
-                    <StatLabel>Pending</StatLabel>
-                    <StatNumber>{pendingServices}</StatNumber>
-                    <StatHelpText>
-                      <HStack>
-                        <Icon as={FiClock} color="yellow.500" />
+                  <Stat size={{ base: "sm", md: "md" }}>
+                    <StatLabel fontSize={{ base: "xs", md: "sm" }}>Pending</StatLabel>
+                    <StatNumber fontSize={{ base: "lg", md: "2xl" }}>{pendingServices}</StatNumber>
+                    <StatHelpText fontSize={{ base: "xs", md: "sm" }}>
+                      <HStack spacing={{ base: 1, md: 2 }}>
+                        <Icon as={FiClock} color="yellow.500" boxSize={{ base: 3, md: 4 }} />
                         <Text>Awaiting Action</Text>
                       </HStack>
                     </StatHelpText>
@@ -150,25 +174,37 @@ const UserDashboard: React.FC = () => {
 
         {/* Right Column - Services and Payments */}
         <Box w="100%">
-          <Tabs variant="enclosed">
+          <Tabs 
+            variant="enclosed"
+            isFitted
+            size={{ base: "sm", md: "md" }}
+          >
             <TabList>
-              <Tab fontSize={{ base: "sm", md: "md" }}>
+              <Tab 
+                fontSize={{ base: "xs", md: "md" }}
+                py={{ base: 2, md: 3 }}
+                px={{ base: 2, md: 4 }}
+              >
                 <HStack spacing={{ base: 1, md: 2 }}>
-                  <Icon as={FiList} />
+                  <Icon as={FiList} boxSize={{ base: 3, md: 4 }} />
                   <Text>Services</Text>
                 </HStack>
               </Tab>
-              <Tab fontSize={{ base: "sm", md: "md" }}>
+              <Tab 
+                fontSize={{ base: "xs", md: "md" }}
+                py={{ base: 2, md: 3 }}
+                px={{ base: 2, md: 4 }}
+              >
                 <HStack spacing={{ base: 1, md: 2 }}>
-                  <Icon as={FiDollarSign} />
+                  <Icon as={FiDollarSign} boxSize={{ base: 3, md: 4 }} />
                   <Text>Payments</Text>
                 </HStack>
               </Tab>
             </TabList>
 
             <TabPanels>
-              <TabPanel p={{ base: 2, md: 4 }}>
-                <VStack spacing={{ base: 4, md: 8 }} align="stretch">
+              <TabPanel px={{ base: 0, md: 4 }} py={{ base: 2, md: 4 }}>
+                <VStack spacing={{ base: 3, md: 8 }} align="stretch">
                   <Box>
                     <RegisteredServices />
                   </Box>
@@ -177,7 +213,7 @@ const UserDashboard: React.FC = () => {
                   </Box>
                 </VStack>
               </TabPanel>
-              <TabPanel>
+              <TabPanel px={{ base: 0, md: 4 }} py={{ base: 2, md: 4 }}>
                 <PaymentSection />
               </TabPanel>
             </TabPanels>

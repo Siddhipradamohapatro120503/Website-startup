@@ -17,7 +17,7 @@ import {
   Image,
   Link,
 } from '@chakra-ui/react';
-import { FiSend, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiGithub } from 'react-icons/fi';
+import { FiSend, FiFacebook, FiTwitter, FiInstagram, FiLinkedin } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const Footer: React.FC = () => {
@@ -72,6 +72,9 @@ const Footer: React.FC = () => {
             </Text>
             <HStack spacing={6}>
               <IconButton
+                as="a"
+                href="https://www.facebook.com/shreetech"
+                target="_blank"
                 aria-label="Facebook"
                 icon={<FiFacebook />}
                 size="sm"
@@ -83,6 +86,9 @@ const Footer: React.FC = () => {
                 }}
               />
               <IconButton
+                as="a"
+                href="https://x.com/technologi51361"
+                target="_blank"
                 aria-label="Twitter"
                 icon={<FiTwitter />}
                 size="sm"
@@ -94,6 +100,9 @@ const Footer: React.FC = () => {
                 }}
               />
               <IconButton
+                as="a"
+                href="https://www.instagram.com/shreetech_org/"
+                target="_blank"
                 aria-label="Instagram"
                 icon={<FiInstagram />}
                 size="sm"
@@ -105,6 +114,9 @@ const Footer: React.FC = () => {
                 }}
               />
               <IconButton
+                as="a"
+                href="https://www.linkedin.com/in/shree-technologies-b52b53343/"
+                target="_blank"
                 aria-label="LinkedIn"
                 icon={<FiLinkedin />}
                 size="sm"
@@ -112,17 +124,6 @@ const Footer: React.FC = () => {
                 variant="ghost"
                 _hover={{
                   bg: 'blue.600',
-                  color: 'white',
-                }}
-              />
-              <IconButton
-                aria-label="GitHub"
-                icon={<FiGithub />}
-                size="sm"
-                color={textColor}
-                variant="ghost"
-                _hover={{
-                  bg: 'gray.700',
                   color: 'white',
                 }}
               />
@@ -192,7 +193,7 @@ const Footer: React.FC = () => {
           pt={6}
           fontSize="sm"
         >
-          <Text>Made with ❤️ by the Shreetech Team</Text>
+          <Text>Made by the Shreetech Team</Text>
           <HStack spacing={4} mt={{ base: 4, md: 0 }}>
             <Text as="a" href="#" _hover={{ color: 'blue.400' }}>
               Terms

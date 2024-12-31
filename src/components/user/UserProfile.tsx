@@ -94,29 +94,48 @@ const UserProfile = () => {
   };
 
   return (
-    <Container maxW="container.md" py={8}>
-      <VStack spacing={8} align="stretch">
+    <Container maxW="container.md" p={0}>
+      <VStack spacing={{ base: 4, md: 8 }} align="stretch">
         <Box textAlign="center">
           <Avatar
-            size="2xl"
+            size={{ base: "xl", md: "2xl" }}
             name={`${user?.firstName} ${user?.lastName}`}
             src={user?.avatar || undefined}
             bg={iconColor}
           />
-          <Text mt={4} fontSize="2xl" fontWeight="bold" color={textColor}>
+          <Text 
+            mt={{ base: 2, md: 4 }} 
+            fontSize={{ base: "xl", md: "2xl" }} 
+            fontWeight="bold" 
+            color={textColor}
+          >
             {user?.firstName} {user?.lastName}
           </Text>
-          <Text color={textColor}>{user?.email}</Text>
+          <Text 
+            color={textColor}
+            fontSize={{ base: "sm", md: "md" }}
+            mt={1}
+          >
+            {user?.email}
+          </Text>
         </Box>
 
-        <Box p={6} borderWidth={1} borderRadius="lg" bg={bgColor} borderColor={borderColor} shadow="sm">
-          <VStack spacing={6} align="stretch">
-            <Heading size="md">Profile Information</Heading>
+        <Box 
+          p={{ base: 4, md: 6 }} 
+          borderWidth={1} 
+          borderRadius="lg" 
+          bg={bgColor} 
+          borderColor={borderColor} 
+          shadow="sm"
+        >
+          <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+            <Heading size={{ base: "sm", md: "md" }}>Profile Information</Heading>
             {isEditing ? (
               <>
                 <FormControl>
-                  <FormLabel>First Name</FormLabel>
+                  <FormLabel fontSize={{ base: "sm", md: "md" }}>First Name</FormLabel>
                   <Input
+                    size={{ base: "sm", md: "md" }}
                     value={formData.firstName}
                     onChange={(e) =>
                       setFormData({ ...formData, firstName: e.target.value })
@@ -125,8 +144,9 @@ const UserProfile = () => {
                 </FormControl>
 
                 <FormControl>
-                  <FormLabel>Last Name</FormLabel>
+                  <FormLabel fontSize={{ base: "sm", md: "md" }}>Last Name</FormLabel>
                   <Input
+                    size={{ base: "sm", md: "md" }}
                     value={formData.lastName}
                     onChange={(e) =>
                       setFormData({ ...formData, lastName: e.target.value })
@@ -135,8 +155,9 @@ const UserProfile = () => {
                 </FormControl>
 
                 <FormControl>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel fontSize={{ base: "sm", md: "md" }}>Email</FormLabel>
                   <Input
+                    size={{ base: "sm", md: "md" }}
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -145,33 +166,76 @@ const UserProfile = () => {
                 </FormControl>
 
                 <HStack spacing={4} justify="flex-end">
-                  <Button onClick={handleCancel}>Cancel</Button>
-                  <Button colorScheme="blue" onClick={handleSave}>
+                  <Button 
+                    size={{ base: "sm", md: "md" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    size={{ base: "sm", md: "md" }}
+                    colorScheme="blue" 
+                    onClick={handleSave}
+                  >
                     Save Changes
                   </Button>
                 </HStack>
               </>
             ) : (
-              <VStack align="stretch" spacing={4}>
+              <VStack align="stretch" spacing={{ base: 3, md: 4 }}>
                 <Box>
-                  <Text fontWeight="bold" fontSize="sm" color={labelColor}>
+                  <Text 
+                    fontWeight="bold" 
+                    fontSize={{ base: "xs", md: "sm" }} 
+                    color={labelColor}
+                    mb={1}
+                  >
                     First Name
                   </Text>
-                  <Text color={textColor}>{user?.firstName}</Text>
+                  <Text 
+                    color={textColor}
+                    fontSize={{ base: "sm", md: "md" }}
+                  >
+                    {user?.firstName}
+                  </Text>
                 </Box>
                 <Box>
-                  <Text fontWeight="bold" fontSize="sm" color={labelColor}>
+                  <Text 
+                    fontWeight="bold" 
+                    fontSize={{ base: "xs", md: "sm" }} 
+                    color={labelColor}
+                    mb={1}
+                  >
                     Last Name
                   </Text>
-                  <Text color={textColor}>{user?.lastName}</Text>
+                  <Text 
+                    color={textColor}
+                    fontSize={{ base: "sm", md: "md" }}
+                  >
+                    {user?.lastName}
+                  </Text>
                 </Box>
                 <Box>
-                  <Text fontWeight="bold" fontSize="sm" color={labelColor}>
+                  <Text 
+                    fontWeight="bold" 
+                    fontSize={{ base: "xs", md: "sm" }} 
+                    color={labelColor}
+                    mb={1}
+                  >
                     Email
                   </Text>
-                  <Text color={textColor}>{user?.email}</Text>
+                  <Text 
+                    color={textColor}
+                    fontSize={{ base: "sm", md: "md" }}
+                  >
+                    {user?.email}
+                  </Text>
                 </Box>
-                <Button alignSelf="flex-end" onClick={handleEdit}>
+                <Button 
+                  alignSelf="flex-end"
+                  size={{ base: "sm", md: "md" }}
+                  onClick={handleEdit}
+                >
                   Edit Profile
                 </Button>
               </VStack>

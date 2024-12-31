@@ -18,27 +18,25 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install backend dependencies
+    - name: Install frontend dependencies
       run: npm install
       
-    - name: Install frontend dependencies
+    - name: Install backend dependencies
       run: |
-        cd client
+        cd server
         npm install
 
-    - name: Run tests
+    - name: Run frontend tests
       run: npm test
 
     - name: Build frontend
-      run: |
-        cd client
-        npm run build
+      run: npm run build
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build
-        path: ./client/build
+        path: ./build
         retention-days: 5
 
     - name: Deploy to local server
@@ -115,8 +113,8 @@ jobs:
           # Setup daily MongoDB backup cron job
           (crontab -l 2>/dev/null; echo "0 0 * * * mongodump --uri='mongodb://${{ secrets.MONGO_APP_USERNAME }}:${{ secrets.MONGO_APP_PASSWORD }}@localhost:27017/${{ secrets.MONGO_DB_NAME }}' --out=/backup/mongodb/backup_\$(date +\%Y\%m\%d_\%H\%M\%S) && find /backup/mongodb -type d -mtime +7 -exec rm -rf {} +") | crontab -
 
-          # Create production env file
-          cat > /path/to/your/app/.env << EOF
+          # Create production env file for backend
+          cat > /var/www/main-landing-page/server/.env << EOF
           MONGODB_URI=mongodb://${{ secrets.MONGO_APP_USERNAME }}:${{ secrets.MONGO_APP_PASSWORD }}@localhost:27017/${{ secrets.MONGO_DB_NAME }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           NODE_ENV=production
@@ -126,13 +124,17 @@ jobs:
           # Update system and install Certbot if not present
           sudo apt-get install -y certbot python3-certbot-nginx nginx
 
-          # Navigate to app directory
-          cd /path/to/your/app
-          
-          # Pull latest changes and install dependencies
+          # Navigate to app directory and update code
+          cd /var/www/main-landing-page
           git pull origin main
+          
+          # Install and build frontend
           npm install
-          npm run build --prefix client
+          npm run build
+          
+          # Install backend dependencies
+          cd server
+          npm install
 
           # Configure Nginx
           sudo tee /etc/nginx/sites-available/mern-app << 'EOF'
@@ -141,12 +143,10 @@ jobs:
               server_name ${{ secrets.DOMAIN_NAME }};
               
               location / {
-                  proxy_pass http://localhost:3000;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade $http_upgrade;
-                  proxy_set_header Connection 'upgrade';
-                  proxy_set_header Host $host;
-                  proxy_cache_bypass $http_upgrade;
+                  root /var/www/main-landing-page/build;
+                  try_files $uri $uri/ /index.html;
+                  expires 30d;
+                  add_header Cache-Control "public, no-transform";
               }
 
               location /api {
@@ -169,5 +169,6 @@ jobs:
             sudo certbot --nginx -d ${{ secrets.DOMAIN_NAME }} --non-interactive --agree-tos -m ${{ secrets.SSL_EMAIL }}
           fi
 
-          # Restart the application
-          pm2 restart all
+          # Start/Restart the backend server with PM2
+          cd /var/www/main-landing-page/server
+          pm2 restart index || pm2 start index.js --name "index"

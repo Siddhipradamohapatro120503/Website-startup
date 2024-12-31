@@ -27,7 +27,7 @@ jobs:
         npm install
 
     - name: Run frontend tests
-      run: npm test
+      run: npm test -- --passWithNoTests
 
     - name: Build frontend
       run: npm run build

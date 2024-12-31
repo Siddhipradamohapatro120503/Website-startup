@@ -54,6 +54,8 @@ import {
   FiDollarSign,
 } from 'react-icons/fi';
 
+import { API_BASE_URL } from '../../../config/api';
+
 interface Skill {
   _id?: string;
   name: string;
@@ -143,7 +145,7 @@ const FreelancerManagement: React.FC = () => {
   const fetchFreelancers = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('http://localhost:5000/api/freelancers');
+      const response = await axios.get(`${API_BASE_URL}/freelancers`);
       setFreelancers(response.data);
     } catch (error) {
       console.error('Error fetching freelancers:', error);
@@ -183,7 +185,7 @@ const FreelancerManagement: React.FC = () => {
 
       console.log('Sanitized update data:', updatedData);
 
-      const response = await axios.put(`http://localhost:5000/api/freelancers/${id}`, updatedData);
+      const response = await axios.put(`${API_BASE_URL}/freelancers/${id}`, updatedData);
       console.log('Server response:', response.data);
 
       setFreelancers(freelancers.map(f => f._id === id ? response.data : f));
@@ -207,7 +209,7 @@ const FreelancerManagement: React.FC = () => {
 
   const handleDeleteFreelancer = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/freelancers/${id}`);
+      await axios.delete(`${API_BASE_URL}/freelancers/${id}`);
       setFreelancers(freelancers.filter(f => f._id !== id));
       if (selectedFreelancer?._id === id) {
         setSelectedFreelancer(null);
@@ -247,7 +249,7 @@ const FreelancerManagement: React.FC = () => {
         }
       };
 
-      const response = await axios.post('http://localhost:5000/api/freelancers', newFreelancer);
+      const response = await axios.post(`${API_BASE_URL}/freelancers`, newFreelancer);
       setFreelancers([...freelancers, response.data]);
       onClose();
       setIsAddMode(false);
@@ -300,7 +302,7 @@ const FreelancerManagement: React.FC = () => {
       console.log('Sending validated data:', validatedData);
 
       const response = await axios.put<Freelancer>(
-        `http://localhost:5000/api/freelancers/${selectedFreelancer._id}`,
+        `${API_BASE_URL}/freelancers/${selectedFreelancer._id}`,
         validatedData
       );
 

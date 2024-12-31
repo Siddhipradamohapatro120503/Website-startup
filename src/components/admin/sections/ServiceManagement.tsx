@@ -43,7 +43,7 @@ import {
   Tab,
   TabPanel,
   Heading,
-  useToast, // Replace 'toast' with 'useToast'
+  useToast, 
   Textarea
 } from '@chakra-ui/react';
 import {
@@ -60,7 +60,12 @@ import {
   FiDatabase
 } from 'react-icons/fi';
 
-import { seedServicesFromLanding } from '../../../scripts/seedServices';
+import axios from '../../../api/axios'; 
+import { AxiosError } from 'axios';
+
+import {
+  seedServicesFromLanding
+} from '../../../scripts/seedServices';
 
 interface SubCategory {
   name: string;
@@ -98,6 +103,12 @@ interface Service {
   description?: string;
 }
 
+interface ApiErrorResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
 // Mock data
 const mockServices: Service[] = [];
 
@@ -110,7 +121,7 @@ const ServiceManagement: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const toast = useToast(); // Initialize the useToast hook
+  const toast = useToast(); 
 
   const fetchServices = async () => {
     try {
@@ -126,20 +137,15 @@ const ServiceManagement: React.FC = () => {
 
       console.log('Fetching services with params:', params.toString());
 
-      const response = await fetch(`http://localhost:5000/api/services?${params.toString()}`, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await axios.get(`services?${params.toString()}`);
       
-      if (!response.ok) {
-        const errorData = await response.text();
+      if (!response.data.success) {
+        const errorData = response.data.message;
         console.error('Error response:', errorData);
         throw new Error(errorData || 'Failed to fetch services');
       }
       
-      const data = await response.json();
+      const data = response.data.data;
       console.log('Received services:', data);
       
       setServices(data);
@@ -303,7 +309,6 @@ const ServiceManagement: React.FC = () => {
 
   const handleCreateService = async (serviceData: Partial<Service>) => {
     try {
-      // Get the token from localStorage explicitly
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found. Please log in.');
@@ -311,55 +316,44 @@ const ServiceManagement: React.FC = () => {
 
       console.log('Creating service with data:', serviceData);
       
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/services`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Add the token to the headers
+      const response = await axios.post('services', {
+        name: serviceData.name,
+        category: serviceData.category,
+        description: serviceData.description,
+        status: serviceData.status || 'draft',
+        pricing: {
+          base: serviceData.pricing?.base || 0,
+          premium: serviceData.pricing?.premium || 0,
+          enterprise: serviceData.pricing?.enterprise || 0,
         },
-        body: JSON.stringify({
-          name: serviceData.name,
-          category: serviceData.category,
-          description: serviceData.description, // Added description field
-          status: serviceData.status || 'draft',
-          pricing: {
-            base: serviceData.pricing?.base || 0,
-            premium: serviceData.pricing?.premium || 0,
-            enterprise: serviceData.pricing?.enterprise || 0,
-          },
-          metrics: {
-            views: 0,
-            bookings: 0,
-            rating: 0,
-          },
-          subCategories: serviceData.subCategories || [],
-          availability: serviceData.availability || {
-            regions: [],
-            schedule: [],
-          },
-        }),
+        metrics: {
+          views: 0,
+          bookings: 0,
+          rating: 0,
+        },
+        subCategories: serviceData.subCategories || [],
+        availability: serviceData.availability || {
+          regions: [],
+          schedule: [],
+        },
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Error response:', errorData);
-        throw new Error(errorData || 'Failed to create service');
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Failed to create service');
       }
       
-      const createdService = await response.json();
-      console.log('Created service:', createdService);
-      
-      // Update services list
       await fetchServices();
-      
-      // Close modal
       onClose();
     } catch (error) {
       console.error('Error creating service:', error);
-      // Show error toast using the useToast hook
+      const axiosError = error as AxiosError<ApiErrorResponse>;
       toast({
         title: 'Error Creating Service',
-        description: error instanceof Error ? error.message : 'Failed to create service',
+        description: axiosError.response?.data?.message || axiosError.message || 'Failed to create service',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -375,30 +369,23 @@ const ServiceManagement: React.FC = () => {
     }
 
     try {
-      // Get the token from localStorage
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found. Please log in.');
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/services/${serviceId}`, {
-        method: 'DELETE',
+      const response = await axios.delete(`services/${serviceId}`, {
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
+        }
       });
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || 'Failed to delete service');
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Failed to delete service');
       }
 
-      // Refresh services after deletion
       await fetchServices();
       
-      // Show success toast
       toast({
         title: 'Service Deleted',
         description: 'The service has been successfully deleted.',
@@ -409,10 +396,10 @@ const ServiceManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('Error deleting service:', error);
-      // Show error toast
+      const axiosError = error as AxiosError<ApiErrorResponse>;
       toast({
         title: 'Error Deleting Service',
-        description: error instanceof Error ? error.message : 'Failed to delete service',
+        description: axiosError.response?.data?.message || axiosError.message || 'Failed to delete service',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -430,7 +417,7 @@ const ServiceManagement: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
-    description: '', // Added description field
+    description: '', 
     pricing: {
       base: 0,
       premium: 0,
@@ -476,10 +463,9 @@ const ServiceManagement: React.FC = () => {
                 try {
                   const result = await seedServicesFromLanding();
                   if (result.success) {
-                    await fetchServices(); // Refresh the services list
+                    await fetchServices(); 
                   }
                   
-                  // Show toast with detailed message
                   toast({
                     title: result.success ? 'Services Import Complete' : 'Import Error',
                     description: (

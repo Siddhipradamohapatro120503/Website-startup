@@ -1,4 +1,5 @@
 import { serviceCategories } from '../data/services';
+import { API_BASE_URL } from '../config/api';
 
 interface ServiceData {
   name: string;
@@ -19,7 +20,7 @@ interface SeedResult {
   failed: string[];
 }
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const BASE_URL = API_BASE_URL;
 
 async function seedServices(): Promise<SeedResult> {
   const result: SeedResult = {

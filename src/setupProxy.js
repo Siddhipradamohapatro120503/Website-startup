@@ -4,11 +4,9 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: 'https://shreetech.org',
       changeOrigin: true,
-      headers: {
-        'Host': 'shreetech.org'
-      },
+      secure: true
     })
   );
 };

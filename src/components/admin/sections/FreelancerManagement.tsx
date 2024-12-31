@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../../api/axios';
 import {
   Box,
   Grid,
@@ -53,6 +53,7 @@ import {
   FiClock,
   FiDollarSign,
 } from 'react-icons/fi';
+import { AxiosError } from 'axios';
 
 import { API_BASE_URL } from '../../../config/api';
 
@@ -90,6 +91,12 @@ interface Freelancer {
   phone: string;
   location: string;
   bio: string;
+}
+
+interface ApiErrorResponse {
+  success: boolean;
+  message: string;
+  data?: any;
 }
 
 const FreelancerManagement: React.FC = () => {
@@ -156,60 +163,45 @@ const FreelancerManagement: React.FC = () => {
 
   const handleUpdateFreelancer = async (id: string, updatedData: Partial<Freelancer>) => {
     try {
-      console.log('Updating freelancer:', id);
-      console.log('Update data:', updatedData);
-
-      // Ensure skills array is properly formatted
-      if (updatedData.skills) {
-        updatedData.skills = updatedData.skills.map(skill => ({
-          name: skill.name.trim(),
-          level: typeof skill.level === 'string' ? parseInt(skill.level) : skill.level
-        })).filter(skill => skill.name && !isNaN(skill.level) && skill.level >= 0 && skill.level <= 100);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
       }
 
-      // Ensure projects array is properly formatted
-      if (updatedData.projects) {
-        updatedData.projects = updatedData.projects.map(project => ({
-          name: project.name.trim(),
-          status: project.status,
-          clientRating: typeof project.clientRating === 'string' ? 
-            parseFloat(project.clientRating) : project.clientRating
-        })).filter(project => 
-          project.name && 
-          ['completed', 'in-progress', 'cancelled'].includes(project.status) &&
-          !isNaN(project.clientRating) &&
-          project.clientRating >= 0 && 
-          project.clientRating <= 5
-        );
-      }
+      const response = await axios.put(`${API_BASE_URL}/freelancers/${id}`, updatedData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      console.log('Sanitized update data:', updatedData);
-
-      const response = await axios.put(`${API_BASE_URL}/freelancers/${id}`, updatedData);
-      console.log('Server response:', response.data);
-
-      setFreelancers(freelancers.map(f => f._id === id ? response.data : f));
-      if (selectedFreelancer?._id === id) {
-        setSelectedFreelancer(response.data);
+      if (response.data.success) {
+        setFreelancers(prev => prev.map(f => f._id === id ? { ...f, ...updatedData } : f));
       }
     } catch (error) {
       console.error('Error updating freelancer:', error);
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          console.error('Server error response:', error.response.data);
-          // You might want to show this error to the user via a toast or alert
-        } else if (error.request) {
-          console.error('No response received:', error.request);
-        } else {
-          console.error('Error setting up request:', error.message);
-        }
+      const axiosError = error as AxiosError<ApiErrorResponse>;
+      if (axiosError.response) {
+        console.error('Server error response:', axiosError.response.data.message);
+      } else if (axiosError.request) {
+        console.error('No response received:', axiosError.request);
+      } else {
+        console.error('Error setting up request:', axiosError.message);
       }
     }
   };
 
   const handleDeleteFreelancer = async (id: string) => {
     try {
-      await axios.delete(`${API_BASE_URL}/freelancers/${id}`);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      await axios.delete(`${API_BASE_URL}/freelancers/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setFreelancers(freelancers.filter(f => f._id !== id));
       if (selectedFreelancer?._id === id) {
         setSelectedFreelancer(null);
@@ -228,35 +220,27 @@ const FreelancerManagement: React.FC = () => {
   const handleAddNewFreelancer = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const formData = new FormData(e.currentTarget);
-      const newFreelancer = {
-        name: formData.get('name') as string,
-        email: formData.get('email') as string,
-        phone: formData.get('phone') as string || '',
-        location: formData.get('location') as string || '',
-        title: formData.get('title') as string,
-        bio: formData.get('bio') as string || '',
-        skills: [] as Skill[],
-        projects: [] as Project[],
-        rating: 0,
-        availability: {
-          status: 'available' as const
-        },
-        metrics: {
-          completedProjects: 0,
-          totalEarnings: 0,
-          avgResponseTime: '24 hours'
-        }
-      };
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
 
-      const response = await axios.post(`${API_BASE_URL}/freelancers`, newFreelancer);
-      setFreelancers([...freelancers, response.data]);
-      onClose();
-      setIsAddMode(false);
+      const response = await axios.post(`${API_BASE_URL}/freelancers`, localData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success) {
+        setFreelancers(prev => [...prev, response.data.data]);
+        onClose();
+        setIsAddMode(false);
+      }
     } catch (error) {
       console.error('Error adding freelancer:', error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Server error:', error.response.data);
+      const axiosError = error as AxiosError<ApiErrorResponse>;
+      if (axiosError.response) {
+        console.error('Server error:', axiosError.response.data.message);
       }
     }
   };

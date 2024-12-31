@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
-
 import * as Icons from 'react-icons/fi';
+import { API_BASE_URL } from '../config/api';
 
 interface Service {
   id: string;
@@ -46,8 +46,6 @@ interface ServicesContextType {
 }
 
 const ServicesContext = createContext<ServicesContextType | undefined>(undefined);
-
-const API_BASE_URL = 'http://localhost:5000/api';
 
 export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [registeredServices, setRegisteredServices] = useState<RegisteredService[]>([]);

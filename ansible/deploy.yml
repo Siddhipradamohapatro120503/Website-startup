@@ -15,6 +15,21 @@
     # Payment configuration
     razorpay_key_id: "{{ vault_razorpay_key_id }}"
     razorpay_key_secret: "{{ vault_razorpay_key_secret }}"
+    # Docker configuration
+    dockerhub_username: "{{ dockerhub_username }}"
+
+  pre_tasks:
+    - name: Verify all required variables are defined
+      assert:
+        that:
+          - domain is defined
+          - certbot_email is defined
+          - mongo_user is defined
+          - mongo_password is defined
+          - vault_razorpay_key_id is defined
+          - vault_razorpay_key_secret is defined
+          - dockerhub_username is defined
+        fail_msg: "Missing required variables. Please ensure all variables are defined in your inventory or vars file."
 
   tasks:
     - name: Install dependencies
@@ -117,6 +132,10 @@
             files: ["docker-compose.prod.yml"]
             pull: "always"
             state: present
+          register: pull_result
+          retries: 3
+          delay: 10
+          until: pull_result is not failed
 
         - name: Start MongoDB
           community.docker.docker_compose_v2:
@@ -124,6 +143,10 @@
             files: ["docker-compose.prod.yml"]
             services: ["mongodb"]
             state: present
+          register: mongodb_start
+          retries: 3
+          delay: 10
+          until: mongodb_start is not failed
 
         - name: Wait for MongoDB to be healthy
           shell: >
@@ -140,6 +163,10 @@
             files: ["docker-compose.prod.yml"]
             services: ["backend"]
             state: present
+          register: backend_start
+          retries: 3
+          delay: 10
+          until: backend_start is not failed
           when: mongodb_health.stdout == "healthy"
 
         - name: Wait for backend to be healthy
@@ -157,7 +184,20 @@
             files: ["docker-compose.prod.yml"]
             services: ["frontend"]
             state: present
+          register: frontend_start
+          retries: 3
+          delay: 10
+          until: frontend_start is not failed
           when: backend_health.stdout == "healthy"
+
+        - name: Wait for frontend to be healthy
+          shell: >
+            docker inspect $(docker ps -q --filter name=frontend) --format='{{.State.Health.Status}}'
+          register: frontend_health
+          until: frontend_health.stdout == "healthy"
+          retries: 30
+          delay: 10
+          ignore_errors: yes
 
     - name: Setup SSL
       block:

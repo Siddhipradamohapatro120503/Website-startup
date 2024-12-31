@@ -31,8 +31,8 @@ services:
     environment:
       - MONGODB_URI=mongodb://{{ mongo_user }}:{{ mongo_password }}@mongodb:27017/startup_db?authSource=admin
       - NODE_ENV=production
-      - RAZORPAY_KEY_ID={{ razorpay_key_id }}
-      - RAZORPAY_KEY_SECRET={{ razorpay_key_secret }}
+      # - RAZORPAY_KEY_ID={{ razorpay_key_id }}
+      # - RAZORPAY_KEY_SECRET={{ razorpay_key_secret }}
     depends_on:
       mongodb:
         condition: service_healthy

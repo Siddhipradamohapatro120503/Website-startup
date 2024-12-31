@@ -13,8 +13,8 @@
     mongo_port: 27017
     mongodb_uri: "mongodb://{{ mongo_user }}:{{ mongo_password }}@mongodb:27017/startup_db?authSource=admin"
     # Payment configuration
-    razorpay_key_id: "{{ vault_razorpay_key_id }}"
-    razorpay_key_secret: "{{ vault_razorpay_key_secret }}"
+    # razorpay_key_id: "{{ vault_razorpay_key_id }}"
+    # razorpay_key_secret: "{{ vault_razorpay_key_secret }}"
     # Docker configuration
     dockerhub_username: "{{ dockerhub_username }}"
 
@@ -26,8 +26,6 @@
           - certbot_email is defined
           - mongo_user is defined
           - mongo_password is defined
-          - vault_razorpay_key_id is defined
-          - vault_razorpay_key_secret is defined
           - dockerhub_username is defined
         fail_msg: "Missing required variables. Please ensure all variables are defined in your inventory or vars file."
 

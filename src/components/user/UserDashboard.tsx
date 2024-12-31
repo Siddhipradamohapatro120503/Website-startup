@@ -25,7 +25,7 @@ import {
   useToast,
   Spinner,
 } from '@chakra-ui/react';
-import { FiActivity, FiClock, FiCheckCircle, FiList, FiDollarSign, FiLogOut, FiMoon, FiSun } from 'react-icons/fi';
+import { FiActivity, FiClock, FiList, FiDollarSign, FiLogOut, FiMoon, FiSun } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import ServicesList from './ServicesList';
 import UserProfile from './UserProfile';
@@ -36,7 +36,6 @@ import { ServicesProvider, useServices } from '../../context/ServicesContext';
 const UserDashboard: React.FC = () => {
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const registeredServicesRef = useRef<HTMLDivElement>(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const navigate = useNavigate();
   const toast = useToast();
@@ -45,10 +44,6 @@ const UserDashboard: React.FC = () => {
   // Calculate service counts
   const activeServices = registeredServices?.filter(service => service.status === 'active').length || 0;
   const pendingServices = registeredServices?.filter(service => service.status === 'pending').length || 0;
-
-  const scrollToRegisteredServices = () => {
-    registeredServicesRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const handleLogout = () => {
     // Clear local storage
@@ -166,7 +161,7 @@ const UserDashboard: React.FC = () => {
             <TabPanels>
               <TabPanel>
                 <VStack spacing={8} align="stretch">
-                  <Box ref={registeredServicesRef}>
+                  <Box>
                     <RegisteredServices />
                   </Box>
                   <Box>

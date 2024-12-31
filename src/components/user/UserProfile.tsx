@@ -13,8 +13,6 @@ import {
   Input,
   HStack,
   useColorModeValue,
-  Icon,
-  Badge,
 } from '@chakra-ui/react';
 import { FiMail, FiPhone, FiUser } from 'react-icons/fi';
 import { useAuth } from '../../hooks/useAuth';

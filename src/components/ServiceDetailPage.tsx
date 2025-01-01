@@ -502,7 +502,7 @@ const ServiceDetailPage: React.FC = () => {
                       transition="all 0.3s"
                     >
                       <Image
-                        src="/image/ai-ml1.jpg"
+                        src="/image/computer-vision.jpg"
                         alt="Machine Learning"
                         objectFit="cover"
                         w="100%"
@@ -529,8 +529,8 @@ const ServiceDetailPage: React.FC = () => {
                       transition="all 0.3s"
                     >
                       <Image
-                        src="/image/ai-ml2.jpg"
-                        alt="Deep Learning"
+                        src="/image/computer-vision.jpg"
+                        alt="Computer vision"
                         objectFit="cover"
                         w="100%"
                         h="100%"

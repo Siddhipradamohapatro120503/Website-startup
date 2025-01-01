@@ -5,7 +5,7 @@ import { FiMessageSquare, FiActivity, FiZap, FiArrowRight } from 'react-icons/fi
 import { useNavigate } from 'react-router-dom';
 
 interface ContactSectionProps {
-  onDemoClick: () => void;
+  onDemoClick?: () => void;
 }
 
 const ContactSection: React.FC<ContactSectionProps> = ({ onDemoClick }) => {
@@ -13,6 +13,10 @@ const ContactSection: React.FC<ContactSectionProps> = ({ onDemoClick }) => {
   const cardBgColor = useColorModeValue('white', 'gray.800');
   const cardBorderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.600', 'gray.300');
+
+  const handleDemoClick = () => {
+    navigate('/demo');
+  };
 
   return (
     <Box id="contactus">
@@ -52,6 +56,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({ onDemoClick }) => {
               <Button
                 w="full"
                 colorScheme="blue"
+                variant="outline"
                 onClick={() => navigate('/contact')}
                 rightIcon={<Icon as={FiArrowRight} />}
               >
@@ -91,7 +96,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({ onDemoClick }) => {
                 w="full"
                 colorScheme="blue"
                 variant="outline"
-                onClick={onDemoClick}
+                onClick={handleDemoClick}
                 rightIcon={<Icon as={FiArrowRight} />}
               >
                 Book Demo
@@ -121,19 +126,19 @@ const ContactSection: React.FC<ContactSectionProps> = ({ onDemoClick }) => {
             >
               <Icon as={FiZap} w={10} h={10} color="blue.400" mb={4} />
               <Heading size="lg" mb={4}>
-                Quick Start
+                Quick Support
               </Heading>
               <Text color={textColor} mb={6}>
-                Ready to begin? Start your journey with our quick onboarding process.
+                Need immediate assistance? Our support team is ready to help you right away.
               </Text>
               <Button
                 w="full"
                 colorScheme="blue"
                 variant="outline"
-                onClick={() => navigate('/signup')}
+                onClick={() => window.location.href = 'mailto:support@shreetech.org'}
                 rightIcon={<Icon as={FiArrowRight} />}
               >
-                Get Started
+                Get Support
               </Button>
             </Box>
           </motion.div>

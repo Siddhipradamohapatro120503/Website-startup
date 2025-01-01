@@ -35,10 +35,10 @@ const serviceImages: ServiceImagesType = {
     '/image/dev-backend.jpg'        // Backend Development
   ],
   'AI & Machine Learning': [
-    '/image/ai-hero.jpg',       // Main AI hero image
-    '/image/ai-ml1.jpg',        // Machine Learning Process
-    '/image/ai-ml2.jpg',        // Deep Learning
-    '/image/ai-robotics.jpg'    // AI Robotics
+    '/image/Copilot.jpeg',       // Main AI hero image
+    '/image/computer-vision.jpeg',        // Machine Learning Process
+    '/image/AI-NLP.jpeg',        // Deep Learning
+    '/image/pe-ai.jpeg'    // AI Robotics
   ],
   'Content Creation': [
     '/image/service5.jpg',  // Main hero image

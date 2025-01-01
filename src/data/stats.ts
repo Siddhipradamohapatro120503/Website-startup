@@ -16,7 +16,7 @@ export const statsData: Stat[] = [
   },
   {
     id: 2,
-    value: "500+",
+    value: "200+",
     label: "Projects Delivered",
     icon: "FiCheckCircle",
     color: "purple"
@@ -30,7 +30,7 @@ export const statsData: Stat[] = [
   },
   {
     id: 4,
-    value: "15+",
+    value: "4+",
     label: "Years Experience",
     icon: "FiAward",
     color: "orange"

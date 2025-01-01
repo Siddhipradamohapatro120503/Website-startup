@@ -146,17 +146,17 @@ const Footer: React.FC = () => {
           </Stack>
           <Stack align={'flex-start'}>
             <ListHeader>Support</ListHeader>
-            <Link href="#" _hover={{ color: 'blue.400' }}>
-              Help Center
-            </Link>
-            <Link href="#" _hover={{ color: 'blue.400' }}>
+            <Link href="/terms" _hover={{ color: 'blue.400' }}>
               Terms of Service
             </Link>
-            <Link href="#" _hover={{ color: 'blue.400' }}>
+            <Link href="/privacy" _hover={{ color: 'blue.400' }}>
               Privacy Policy
             </Link>
-            <Link href="#" _hover={{ color: 'blue.400' }}>
-              Status
+            <Link href="/shipping" _hover={{ color: 'blue.400' }}>
+              Shipping & Delivery
+            </Link>
+            <Link href="/cancellation" _hover={{ color: 'blue.400' }}>
+              Cancellation & Refund
             </Link>
           </Stack>
           <Stack align={'flex-start'}>

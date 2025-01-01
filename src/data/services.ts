@@ -29,7 +29,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Predictive Maintenance', 'Image Classification', 'Natural Language Processing', 'Recommendation Systems'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
@@ -43,7 +43,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Image Classification', 'Object Detection', 'Facial Recognition', 'Image Segmentation'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
@@ -57,7 +57,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Text Classification', 'Sentiment Analysis', 'Language Translation', 'Named Entity Recognition'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
@@ -71,7 +71,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Time Series Forecasting', 'Anomaly Detection', 'Pattern Recognition', 'Predictive Maintenance'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
@@ -91,7 +91,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Social Media Videos', 'Event Videos', 'Product Videos', 'Explainer Videos'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Graphic Design and Video editing services Brochure.pdf',
@@ -105,7 +105,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Logo Design', 'Brand Identity', 'Marketing Materials', 'Social Media Graphics'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Graphic Design and Video editing services Brochure.pdf',
@@ -125,7 +125,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Social Media Management', 'Content Creation', 'Community Engagement', 'Influencer Marketing'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Social Media  services Brochure.pdf',
@@ -145,7 +145,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Lead Generation', 'Brand Awareness', 'Product Launch', 'Event Promotion'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Social Media  services Brochure.pdf',
@@ -165,7 +165,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Web Application Development', 'E-commerce Solutions', 'Responsive Design', 'API Integration'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf',
@@ -179,7 +179,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Web Application Design', 'Mobile App Design', 'Responsive Design', 'User Experience'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf',
@@ -225,7 +225,7 @@ export const serviceCategories: ServiceCategory[] = [
           'Accessibility Focused'
         ],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'design@shreetech.org'
         },
         brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf'
@@ -245,7 +245,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Cloud Infrastructure', 'On-premises Infrastructure', 'Hybrid Infrastructure', 'Disaster Recovery'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
@@ -259,7 +259,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Cloud Migration', 'Cloud Native Applications', 'Hybrid Cloud', 'Cloud Security'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
@@ -273,7 +273,7 @@ export const serviceCategories: ServiceCategory[] = [
         useCases: ['Continuous Integration', 'Continuous Deployment', 'Continuous Monitoring', 'Continuous Security'],
         whyChooseUs: ['Expert Consultation', 'Customized Solutions', 'Dedicated Support', 'Industry Best Practices'],
         contactInfo: {
-          phone: '+1 (234) 567-8900',
+          phone: 'NA',
           email: 'support@shreetech.org',
         },
         brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',

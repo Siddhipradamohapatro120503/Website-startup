@@ -14,6 +14,14 @@ import {
   Text,
   Image,
   VStack,
+  HStack,
+  useBreakpointValue,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
 } from '@chakra-ui/react';
 import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import { useSmoothScroll } from '../../contexts/SmoothScrollContext';
@@ -43,163 +51,213 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export default function Navbar() {
-  const { isOpen, onToggle } = useDisclosure();
+  const { isOpen, onToggle, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
   const { scrollToSection } = useSmoothScroll();
   const navigate = useNavigate();
 
-  const bgColor = useColorModeValue('blue.400', 'gray.800');
-  const textColor = useColorModeValue('white', 'gray.600');
-  const borderColor = useColorModeValue('blue.500', 'gray.700');
-  const buttonHoverBg = useColorModeValue('blue.500', 'gray.700');
-  const buttonTextColor = useColorModeValue('white', textColor);
+  const bgGradient = useColorModeValue(
+    'linear(to-r, blue.900, purple.500)',
+    'none'
+  );
+  const bgSolid = useColorModeValue('purple.500', 'gray.800');
+  const textColor = useColorModeValue('white', 'gray.200');
+  const borderColor = useColorModeValue('purple.500', 'gray.700');
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const hoverBgColor = useColorModeValue('whiteAlpha.200', 'transparent');
+  const hoverTextColor = useColorModeValue('white', 'blue.500');
+  const buttonBg = useColorModeValue('white', 'blue.500');
+  const buttonColor = useColorModeValue('purple.600', 'white');
+  const buttonHoverBg = useColorModeValue('gray.100', 'blue.600');
+  const iconButtonHoverBg = useColorModeValue('whiteAlpha.200', 'gray.700');
 
-  const handleNavClick = (href: string) => {
+  const handleNavigation = (href: string) => {
     if (href === '/') {
       navigate(href);
-    } else if (href.startsWith('#')) {
-      const sectionId = href.replace('#', '');
-      scrollToSection(sectionId);
+      window.scrollTo(0, 0);
     } else {
       navigate(href);
     }
+    onClose();
   };
 
   const handleGetStarted = () => {
     navigate('/login');
   };
 
+  const DesktopNav = () => {
+    return (
+      <HStack spacing={8} align="center" display={{ base: 'none', md: 'flex' }}>
+        {NAV_ITEMS.map((navItem) => (
+          <Button
+            key={navItem.label}
+            variant="ghost"
+            color={textColor}
+            _hover={{
+              textDecoration: 'none',
+              color: hoverTextColor,
+              bg: hoverBgColor,
+            }}
+            onClick={() => handleNavigation(navItem.href)}
+          >
+            {navItem.label}
+          </Button>
+        ))}
+      </HStack>
+    );
+  };
+
+  const MobileNav = () => {
+    return (
+      <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="xs">
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
+          <DrawerBody>
+            <VStack spacing={4} align="stretch" pt={4}>
+              {NAV_ITEMS.map((navItem) => (
+                <Button
+                  key={navItem.label}
+                  variant="ghost"
+                  w="full"
+                  justifyContent="flex-start"
+                  onClick={() => handleNavigation(navItem.href)}
+                >
+                  {navItem.label}
+                </Button>
+              ))}
+              <Button
+                w="full"
+                colorScheme="blue"
+                onClick={handleGetStarted}
+              >
+                Get Started
+              </Button>
+            </VStack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    );
+  };
+
   return (
     <Box
-      position="fixed"
+      position="sticky"
       top={0}
-      left={0}
-      right={0}
-      zIndex={1000}
-      bg={bgColor}
+      zIndex="sticky"
+      bgGradient={bgGradient}
+      bg={bgSolid}
       borderBottom={1}
-      borderStyle={'solid'}
+      borderStyle="solid"
       borderColor={borderColor}
+      transition="all 0.3s ease"
+      backdropFilter="blur(10px)"
+      boxShadow="lg"
+      color={textColor}
+      _before={{
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        bgGradient: useColorModeValue(
+          'linear(to-r, blue.900, transparent)',
+          'none'
+        ),
+        opacity: 0.4,
+        pointerEvents: 'none',
+      }}
     >
-      <Container maxW="container.xl">
+      <Container maxW="container.xl" position="relative">
         <Flex
-          minH={'60px'}
-          py={{ base: 1 }}
+          minH="60px"
+          py={{ base: 2 }}
           px={{ base: 4 }}
-          align={'center'}
-          justify={'space-between'}
+          align="center"
+          justify="space-between"
         >
           <Flex flex={{ base: 1 }} justify={{ base: 'start', md: 'start' }}>
-            <VStack spacing={1} align="center" cursor="pointer" onClick={() => navigate('/')}>
+            <Box
+              as="button"
+              onClick={() => handleNavigation('/')}
+              display="flex"
+              alignItems="center"
+              position="relative"
+              py={2}
+              ml={{ base: "-65px", md: "0" }}
+            >
               <Image
-                src={useColorModeValue('/image/logo.png', '/image/logo.png')}
-                alt="Startup Logo"
-                height="250px"
-                width="250px"
-                objectFit="cover"
-                borderRadius="full"
-                mt="-90px"
-                mb="-90px"
-                filter={useColorModeValue('brightness(1)', 'brightness(1.2)')}
-                transition="all 0.2s"
+                src="/image/logo.png"
+                alt="Logo"
+                h={{ base: "200px", md: "160px", lg: "250px" }}
+                objectFit="contain"
+                mr={2}
+                mt={{ base: "-75px", md: "-45px", lg: "-100px" }}
+                mb={{ base: "-75px", md: "-45px", lg: "-100px" }}
+                transition="all 0.3s ease"
+                _hover={{ transform: 'scale(1.05)' }}
+                filter={useColorModeValue('none', 'brightness(1.2)')}
+                loading="eager"
               />
-            </VStack>
+            </Box>
           </Flex>
-          <Flex
-            flex={{ base: 1, md: 'auto' }}
-            ml={{ base: -2 }}
-            display={{ base: 'flex', md: 'none' }}
-          >
-            <IconButton
-              onClick={onToggle}
-              icon={isOpen ? <FiX /> : <FiMenu />}
-              variant="ghost"
-              aria-label="Toggle Navigation"
-            />
-          </Flex>
-          <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-            <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-              <Stack direction="row" spacing={4}>
-                {NAV_ITEMS.map((navItem) => (
-                  <Button
-                    key={navItem.label}
-                    variant="ghost"
-                    onClick={() => handleNavClick(navItem.href)}
-                    color={buttonTextColor}
-                    _hover={{
-                      bg: buttonHoverBg
-                    }}
-                  >
-                    {navItem.label}
-                  </Button>
-                ))}
-              </Stack>
-            </Flex>
-          </Flex>
+
+          <DesktopNav />
 
           <Stack
             flex={{ base: 1, md: 0 }}
             justify="flex-end"
             direction="row"
             spacing={6}
+            align="center"
+            mr={{ base: 0, md: 4 }}
           >
             <IconButton
               aria-label="Toggle color mode"
               icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
               onClick={toggleColorMode}
               variant="ghost"
+              size="sm"
+              color={textColor}
+              _hover={{
+                bg: iconButtonHoverBg,
+              }}
             />
+            
             <Button
               display={{ base: 'none', md: 'inline-flex' }}
               fontSize="sm"
               fontWeight={600}
-              color="white"
-              bg="blue.600"
-              onClick={handleGetStarted}
+              color={buttonColor}
+              bg={buttonBg}
               _hover={{
-                bg: 'blue.400',
+                bg: buttonHoverBg,
               }}
+              onClick={handleGetStarted}
+              size="md"
+              px={6}
+              mr={2}
             >
               Get Started
             </Button>
+            
+            {isMobile && (
+              <IconButton
+                aria-label="Open menu"
+                icon={<FiMenu />}
+                onClick={onToggle}
+                variant="ghost"
+                size="sm"
+                display={{ base: 'flex', md: 'none' }}
+              />
+            )}
           </Stack>
         </Flex>
-
-        <Collapse in={isOpen} animateOpacity>
-          <Stack
-            p={4}
-            display={{ md: 'none' }}
-            spacing={4}
-            bg={bgColor}
-          >
-            {NAV_ITEMS.map((navItem) => (
-              <Button
-                key={navItem.label}
-                w="full"
-                variant="ghost"
-                onClick={() => handleNavClick(navItem.href)}
-                color={buttonTextColor}
-                _hover={{
-                  bg: buttonHoverBg
-                }}
-              >
-                {navItem.label}
-              </Button>
-            ))}
-            <Button
-              w="full"
-              color="white"
-              bg="blue.400"
-              onClick={handleGetStarted}
-              _hover={{
-                bg: 'blue.300',
-              }}
-            >
-              Get Started
-            </Button>
-          </Stack>
-        </Collapse>
       </Container>
+      
+      <MobileNav />
     </Box>
   );
 }

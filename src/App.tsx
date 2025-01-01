@@ -24,7 +24,12 @@ import ServiceDetails from './components/ServiceDetails';
 import ServiceDetailPage from './components/ServiceDetailPage';
 import Features from './components/Features';
 import About from './components/About';
-import Contact from './components/Contact';
+import PrivacyPolicy from './components/pages/PrivacyPolicy';
+import TermsAndConditions from './components/pages/TermsAndConditions';
+import ShippingAndDelivery from './components/pages/ShippingAndDelivery';
+import CancellationAndRefund from './components/pages/CancellationAndRefund';
+import ContactUs from './components/pages/ContactUs';
+import DemoBooking from './components/pages/DemoBooking';
 
 function App() {
   return (
@@ -40,7 +45,12 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/features" element={<Features />} />
               <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/demo" element={<DemoBooking />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/shipping" element={<ShippingAndDelivery />} />
+              <Route path="/cancellation" element={<CancellationAndRefund />} />
               <Route path="/services/:categoryId" element={<ServiceDetails />} />
               <Route path="/services/:categoryId/:serviceId" element={<ServiceDetailPage />} />
               

@@ -28,26 +28,26 @@ const CancellationAndRefund = () => {
   const sections = [
     {
       icon: FaClock,
-      title: "1. Order Cancellation",
-      content: "Orders can be cancelled before they are shipped. Once an order has been shipped, it will need to go through our return process."
+      title: "1. Service Cancellation",
+      content: "You can cancel your service subscription at any time before the service period begins. Once a service period has started, cancellations will be subject to our refund policy."
     },
     {
       icon: FaBox,
-      title: "2. Return Policy",
-      content: "We accept returns within 30 days of delivery. Items must be unused and in their original packaging with all tags attached."
+      title: "2. Refund Eligibility",
+      content: "Refunds are available for services cancelled within 24 hours of purchase, provided the service has not begun. Some specialized services may have different refund policies, which will be clearly stated during purchase."
     },
     {
       icon: FaCreditCard,
       title: "3. Refund Process",
-      content: "Refunds will be processed within 5-7 business days after we receive and inspect the returned items. The refund will be issued to the original payment method."
+      content: "Refunds will be processed through our payment gateway within 5-7 business days of approval. The refund will be issued to the original payment method. For support, contact us at support@shreetech.org"
     }
   ];
 
   const nonRefundableItems = [
-    "Customized or personalized products",
-    "Digital downloads and software licenses",
-    "Gift cards and promotional items",
-    "Items marked as 'Final Sale'"
+    "Services that have already begun",
+    "Completed service deliverables",
+    "Custom or personalized services",
+    "Emergency or time-sensitive services"
   ];
 
   return (

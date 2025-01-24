@@ -16,22 +16,21 @@ import {
   Flex,
 } from '@chakra-ui/react';
 import {
-  FaShippingFast,
-  FaGlobeAmericas,
-  FaBox,
-  FaTruck,
-  FaMapMarkedAlt,
   FaClock,
+  FaCheckCircle,
+  FaUserClock,
+  FaCalendarCheck,
+  FaHeadset,
 } from 'react-icons/fa';
 
-interface ShippingCardProps {
+interface ServiceDeliveryCardProps {
   icon: React.ElementType;
   title: string;
   description: string;
   highlight?: string;
 }
 
-const ShippingCard: React.FC<ShippingCardProps> = ({ icon, title, description, highlight }) => {
+const ServiceDeliveryCard: React.FC<ServiceDeliveryCardProps> = ({ icon, title, description, highlight }) => {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
@@ -64,101 +63,64 @@ const ShippingCard: React.FC<ShippingCardProps> = ({ icon, title, description, h
   );
 };
 
-const ShippingAndDelivery = () => {
+const ServiceDelivery = () => {
   const bgColor = useColorModeValue('gray.50', 'gray.800');
   const statsBg = useColorModeValue('blue.50', 'blue.900');
 
-  const shippingMethods = [
-    {
-      icon: FaTruck,
-      title: 'Standard Shipping',
-      description: 'Reliable delivery within 3-5 business days',
-      highlight: 'Free over $50',
-    },
-    {
-      icon: FaShippingFast,
-      title: 'Express Delivery',
-      description: 'Fast delivery within 1-2 business days',
-      highlight: 'From $14.99',
-    },
-    {
-      icon: FaGlobeAmericas,
-      title: 'International',
-      description: 'Worldwide shipping to over 100 countries',
-      highlight: 'From $19.99',
-    },
-  ];
-
-  const shippingFeatures = [
-    {
-      icon: FaBox,
-      title: 'Package Protection',
-      description: 'All items carefully packaged to ensure safe delivery',
-    },
-    {
-      icon: FaMapMarkedAlt,
-      title: 'Real-time Tracking',
-      description: 'Track your package at every step of its journey',
-    },
+  const serviceDeliveryInfo = [
     {
       icon: FaClock,
-      title: 'Delivery Windows',
-      description: 'Choose your preferred delivery time slot',
+      title: 'Service Initiation',
+      description: 'Services begin within 24 hours after payment confirmation',
+      highlight: '24hr Start',
+    },
+    {
+      icon: FaUserClock,
+      title: 'Service Schedule',
+      description: 'Choose your preferred service time slot for optimal convenience',
+      highlight: 'Flexible Timing',
+    },
+    {
+      icon: FaCalendarCheck,
+      title: 'Delivery Timeline',
+      description: 'Clear timeline provided for each service milestone',
+      highlight: 'Transparent Process',
+    },
+    {
+      icon: FaHeadset,
+      title: 'Support Access',
+      description: '24/7 support available throughout service delivery',
+      highlight: 'Always Available',
     },
   ];
 
   return (
     <Container maxW="container.lg" py={10}>
       <VStack spacing={8} align="stretch">
-        <Box textAlign="center" mb={8}>
+        <Box textAlign="center">
           <Heading as="h1" size="xl" mb={4}>
-            Shipping and Delivery
+            Service Delivery
           </Heading>
           <Text color={useColorModeValue('gray.600', 'gray.400')} fontSize="lg">
-            Fast, reliable shipping to your doorstep
+            Our commitment to timely and professional service delivery
           </Text>
         </Box>
 
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-          {shippingMethods.map((method, index) => (
-            <ShippingCard key={index} {...method} />
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+          {serviceDeliveryInfo.map((info, index) => (
+            <ServiceDeliveryCard key={index} {...info} />
           ))}
         </SimpleGrid>
 
-        <Box bg={statsBg} p={8} borderRadius="lg" my={8}>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-            <Stat>
-              <StatLabel>Average Delivery Time</StatLabel>
-              <StatNumber>3-5 Days</StatNumber>
-              <StatHelpText>Standard Shipping</StatHelpText>
-            </Stat>
-            <Stat>
-              <StatLabel>Countries Served</StatLabel>
-              <StatNumber>100+</StatNumber>
-              <StatHelpText>Worldwide Coverage</StatHelpText>
-            </Stat>
-            <Stat>
-              <StatLabel>Satisfaction Rate</StatLabel>
-              <StatNumber>99%</StatNumber>
-              <StatHelpText>Happy Customers</StatHelpText>
-            </Stat>
-          </SimpleGrid>
-        </Box>
-
-        <Box bg={bgColor} p={8} borderRadius="lg">
-          <Heading as="h2" size="lg" mb={6} textAlign="center">
-            Additional Features
-          </Heading>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-            {shippingFeatures.map((feature, index) => (
-              <ShippingCard key={index} {...feature} />
-            ))}
-          </SimpleGrid>
-        </Box>
-
-        <Box textAlign="center" pt={4}>
-          <Text color={useColorModeValue('gray.600', 'gray.400')} fontSize="sm">
-            Last updated: January 1, 2025
+        <Box
+          bg={statsBg}
+          p={6}
+          borderRadius="lg"
+          mt={8}
+        >
+          <Heading size="md" mb={4}>Service Guarantee</Heading>
+          <Text>
+            We are committed to delivering high-quality services on time, every time. Our service delivery process is designed to be transparent, efficient, and customer-focused.
           </Text>
         </Box>
       </VStack>
@@ -166,4 +128,4 @@ const ShippingAndDelivery = () => {
   );
 };
 
-export default ShippingAndDelivery;
+export default ServiceDelivery;

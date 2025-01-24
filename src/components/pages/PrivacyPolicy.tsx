@@ -120,73 +120,55 @@ const PrivacyPolicy = () => {
   );
   const textColor = useColorModeValue('gray.600', 'gray.400');
 
-  const privacyCards: PrivacyCardProps[] = [
+  const sections = [
     {
-      icon: FaShieldAlt,
-      title: 'Data Protection',
-      description: 'How we protect your personal information',
-      details: [
-        'End-to-end encryption for all sensitive data',
-        'Regular security audits and updates',
-        'Secure data centers with 24/7 monitoring',
-        'Multi-factor authentication options',
-      ],
-    },
-    {
-      icon: FaUserLock,
-      title: 'Information Collection',
-      description: 'What information we collect and why',
-      details: [
-        'Basic account information',
-        'Transaction history and preferences',
-        'Device and browser information',
-        'Usage analytics for service improvement',
-      ],
-    },
-    {
+      title: 'Data Collection',
       icon: FaDatabase,
-      title: 'Data Storage',
-      description: 'How we store and maintain your data',
+      description: 'Information we collect to provide our services',
       details: [
-        'Secure cloud storage solutions',
-        'Regular data backups',
-        'Data retention policies',
-        'Disaster recovery procedures',
+        'Basic contact information (name, email, phone)',
+        'Service preferences and requirements',
+        'Payment information (processed securely via payment gateway)',
+        'Communication history and service feedback',
+        'Technical data for service improvement',
       ],
     },
     {
+      title: 'Data Usage',
       icon: FaExchangeAlt,
-      title: 'Information Sharing',
-      description: 'When and how we share your information',
+      description: 'How we use your information',
       details: [
-        'Third-party service providers',
-        'Legal requirements and compliance',
-        'Business partners with consent',
-        'Anonymous analytics sharing',
+        'To deliver and improve our services',
+        'For communication about your service status',
+        'To process payments securely',
+        'For customer support and feedback',
+        'To maintain service quality',
       ],
     },
     {
-      icon: FaCookie,
-      title: 'Cookie Policy',
-      description: 'How we use cookies and tracking',
+      title: 'Data Security',
+      icon: FaShieldAlt,
+      description: 'How we protect your information',
       details: [
-        'Essential cookies for functionality',
-        'Analytics and performance cookies',
-        'Advertising and targeting cookies',
-        'Cookie preferences management',
+        'Industry-standard encryption for all data',
+        'Secure payment processing through our payment gateway',
+        'Regular security audits and updates',
+        'Strict access controls for staff',
+        'Compliance with data protection regulations',
       ],
     },
     {
-      icon: FaInfoCircle,
       title: 'Your Rights',
-      description: 'Understanding your privacy rights',
+      icon: FaUserLock,
+      description: 'Control over your data',
       details: [
-        'Right to access your data',
-        'Right to request data deletion',
-        'Right to opt-out of marketing',
-        'Right to data portability',
+        'Access your personal information',
+        'Request data correction or deletion',
+        'Opt-out of marketing communications',
+        'Data portability options',
+        'Contact support@shreetech.org for data requests',
       ],
-    },
+    }
   ];
 
   return (
@@ -206,14 +188,14 @@ const PrivacyPolicy = () => {
           </Box>
 
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
-            {privacyCards.map((card, index) => (
+            {sections.map((section, index) => (
               <SlideFade
                 key={index}
                 in={true}
                 offsetY={40}
                 transition={{ enter: { duration: 0.3, delay: index * 0.1 } }}
               >
-                <PrivacyCard {...card} />
+                <PrivacyCard {...section} />
               </SlideFade>
             ))}
           </SimpleGrid>

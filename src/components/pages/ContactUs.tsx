@@ -71,7 +71,7 @@ const ContactUs = () => {
     {
       icon: FaClock,
       title: 'Business Hours',
-      content: 'Mon - Fri: 9:00 AM - 6:00 PM (PST)',
+      content: 'Mon - Fri: 9:00 AM - 6:00 PM (IST)',
     },
     {
       icon: FaGlobe,
@@ -389,7 +389,7 @@ const ContactUs = () => {
                       textAlign="center"
                       fontSize={{ base: "xs", md: "sm" }}
                     >
-                      24/7 Emergency Support Available for Enterprise Customers
+                      24/7 Emergency Support Available
                     </Badge>
                   </VStack>
                 </Box>

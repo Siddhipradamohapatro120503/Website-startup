@@ -8,6 +8,7 @@ export interface IPayment extends Document {
   currency: string;
   status: 'pending' | 'completed' | 'failed';
   paymentMethod: string;
+  gateway: string;
   paymentDate?: Date;
   description?: string;
   transactionId: string;
@@ -50,6 +51,11 @@ const PaymentSchema: Schema = new Schema(
     paymentMethod: {
       type: String,
       default: 'razorpay',
+    },
+    gateway: {
+      type: String,
+      required: true,
+      default: 'payu',
     },
     paymentDate: {
       type: Date,

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import paymentRoutes from './routes/payment';
+import paymentRoutes from './routes/payments';
 import authRoutes from './routes/authRoutes';
 import messageRoutes from './routes/messageRoutes';
 

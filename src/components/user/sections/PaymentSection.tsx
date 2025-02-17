@@ -1,40 +1,41 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box,
-  VStack,
-  Heading,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   Button,
-  useDisclosure,
+  VStack,
+  Text,
+  useColorModeValue,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  Text,
   HStack,
-  Icon,
   Badge,
-  Divider,
-  useColorModeValue,
-  StatGroup,
-  Stat,
-  StatLabel,
-  StatNumber,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useDisclosure,
   useToast,
+  Icon,
+  Divider,
+  Heading,
 } from '@chakra-ui/react';
 import { FiCreditCard, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
-import api from '../../../services/api';
+import axios from 'axios';
+
+// Get base API URL from environment
+// const API_BASE = process.env.REACT_APP_API_URL?.replace(/\/api$/, '') || 'http://localhost:5000';
+
+const API_BASE = "http://localhost:3000"
 
 declare global {
   interface Window {
-    Razorpay: any;
+    bolt: any;
   }
 }
 
@@ -82,7 +83,12 @@ const PaymentSection: React.FC = () => {
 
   const fetchPayments = useCallback(async () => {
     try {
-      const response = await api.get('/payments/user');
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE}/api/payments/user`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setPayments(response.data.payments);
       setStats(response.data.stats);
     } catch (error) {
@@ -97,17 +103,9 @@ const PaymentSection: React.FC = () => {
     }
   }, [toast]);
 
-  const loadRazorpayScript = useCallback(() => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
-
   useEffect(() => {
     fetchPayments();
-    loadRazorpayScript();
-  }, [fetchPayments, loadRazorpayScript]);
+  }, [fetchPayments]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -135,7 +133,7 @@ const PaymentSection: React.FC = () => {
     }
   };
 
-  const handlePayment = (payment: Payment) => {
+  const handlePayment = async (payment: Payment) => {
     setSelectedPayment(payment);
     onOpen();
   };
@@ -145,70 +143,73 @@ const PaymentSection: React.FC = () => {
 
     setLoading(true);
     try {
-      const orderResponse = await api.post('/payments/create-order', {
-        amount: selectedPayment.amount,
-        currency: 'INR',
-        receipt: selectedPayment._id,
-        notes: {
-          serviceId: selectedPayment.serviceId,
-          serviceName: selectedPayment.serviceName,
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${API_BASE}/api/payments/create-order`,
+        {
+          amount: selectedPayment.amount,
+          currency: 'INR',
+          description: 'Service Payment'
         },
-      });
-
-      const { order, key } = orderResponse.data;
-
-      const options = {
-        key,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Shreetech',
-        description: `Payment for ${selectedPayment.serviceName}`,
-        order_id: order.id,
-        handler: async (response: any) => {
-          try {
-            await api.post('/payments/verify', {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-
-            toast({
-              title: 'Success',
-              description: 'Payment processed successfully',
-              status: 'success',
-              duration: 3000,
-              isClosable: true,
-            });
-
-            await fetchPayments();
-            onClose();
-          } catch (error) {
-            console.error('Payment verification failed:', error);
-            toast({
-              title: 'Error',
-              description: 'Payment verification failed',
-              status: 'error',
-              duration: 3000,
-              isClosable: true,
-            });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-        },
-        prefill: {
-          name: localStorage.getItem('userName'),
-          email: localStorage.getItem('userEmail'),
-        },
-        theme: {
-          color: '#3182CE',
-        },
+        }
+      );
+
+      const {
+        key,
+        txnId,
+        amount: payuAmount,
+        productinfo,
+        firstname,
+        email,
+        phone,
+        surl,
+        furl,
+        hash,
+        payuUrl
+      } = response.data;
+
+      // Create form and submit to PayU
+      const form = document.createElement('form');
+      form.setAttribute('action', payuUrl);
+      form.setAttribute('method', 'post');
+      form.setAttribute('style', 'display: none');
+
+      const params = {
+        key,
+        txnid: txnId,
+        amount: payuAmount,
+        productinfo,
+        firstname,
+        email,
+        phone,
+        surl,
+        furl,
+        hash,
       };
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      // Add parameters to form
+      Object.entries(params).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'hidden');
+        input.setAttribute('name', key);
+        input.setAttribute('value', String(value));
+        form.appendChild(input);
+      });
+
+      // Add form to body and submit
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+
     } catch (error) {
-      console.error('Error processing payment:', error);
+      console.error('Payment error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to process payment',
+        description: 'Payment failed. Please try again.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -228,26 +229,22 @@ const PaymentSection: React.FC = () => {
         borderColor={borderColor}
         shadow="sm"
       >
-        <StatGroup>
-          <Stat>
-            <StatLabel color={secondaryTextColor}>Total Payments</StatLabel>
-            <StatNumber color={textColor}>
-              {formatIndianCurrency(stats.totalPayments)}
-            </StatNumber>
-          </Stat>
-          <Stat>
-            <StatLabel color={secondaryTextColor}>Pending Amount</StatLabel>
-            <StatNumber color="orange.500">
-              {formatIndianCurrency(stats.pendingAmount)}
-            </StatNumber>
-          </Stat>
-          <Stat>
-            <StatLabel color={secondaryTextColor}>Completed Amount</StatLabel>
-            <StatNumber color="green.500">
-              {formatIndianCurrency(stats.completedAmount)}
-            </StatNumber>
-          </Stat>
-        </StatGroup>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th bg={tableHeaderBg} color={secondaryTextColor}>Total Payments</Th>
+              <Th bg={tableHeaderBg} color={secondaryTextColor}>Pending Amount</Th>
+              <Th bg={tableHeaderBg} color={secondaryTextColor}>Completed Amount</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td color={textColor}>{formatIndianCurrency(stats.totalPayments)}</Td>
+              <Td color="orange.500">{formatIndianCurrency(stats.pendingAmount)}</Td>
+              <Td color="green.500">{formatIndianCurrency(stats.completedAmount)}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
       </Box>
 
       <Box
@@ -343,7 +340,7 @@ const PaymentSection: React.FC = () => {
                 onClick={processPayment}
                 isLoading={loading}
               >
-                Pay with Razorpay
+                Pay with PayU
               </Button>
             </VStack>
           </ModalBody>

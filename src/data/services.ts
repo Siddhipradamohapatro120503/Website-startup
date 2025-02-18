@@ -32,7 +32,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Ai+ML+services+Brochure.pdf',
       },
       {
         name: 'Computer Vision',
@@ -46,7 +46,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Ai+ML+services+Brochure.pdf',
       },
       {
         name: 'Natural Language Processing',
@@ -60,7 +60,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Ai+ML+services+Brochure.pdf',
       },
       {
         name: 'Predictive Analytics',
@@ -74,7 +74,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Ai ML services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Ai+ML+services+Brochure.pdf',
       },
     ],
   },
@@ -94,7 +94,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Graphic Design and Video editing services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Graphic+Design+and+Video+editing+services+Brochure.pdf',
       },
       {
         name: 'Graphic Design',
@@ -108,7 +108,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Graphic Design and Video editing services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Graphic+Design+and+Video+editing+services+Brochure.pdf',
       },
     ],
   },
@@ -128,7 +128,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Social Media  services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Social+Media++services+Brochure.pdf',
       },
       {
         name: 'Social Media Marketing',
@@ -148,7 +148,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Social Media  services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Social+Media++services+Brochure.pdf',
       },
     ],
   },
@@ -168,7 +168,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Web+dev+%26+web+application+services+Brochure.pdf',
       },
       {
         name: 'Web App Design',
@@ -182,7 +182,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Web+dev+%26+web+application+services+Brochure.pdf',
       },
       {
         name: 'UI/UX Design',
@@ -228,7 +228,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'design@shreetech.org'
         },
-        brochureUrl: '/Brochures/Web dev & web application services Brochure.pdf'
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Web+dev+%26+web+application+services+Brochure.pdf'
       },
     ],
   },
@@ -248,7 +248,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Cloud+Solutions+services+Brochure.pdf',
       },
       {
         name: 'Cloud Solutions',
@@ -262,7 +262,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Cloud+Solutions+services+Brochure.pdf',
       },
       {
         name: 'DevOps Solutions',
@@ -276,7 +276,7 @@ export const serviceCategories: ServiceCategory[] = [
           phone: 'NA',
           email: 'support@shreetech.org',
         },
-        brochureUrl: '/Brochures/Cloud Solutions services Brochure.pdf',
+        brochureUrl: 'https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Cloud+Solutions+services+Brochure.pdf',
       },
     ],
   },

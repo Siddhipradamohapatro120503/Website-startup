@@ -137,7 +137,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick, images }) => 
                     </Button>
                     <Button
                       as="a"
-                      href="/Brochures/Company Brochure.pdf"
+                      href="https://shreetech2025.s3.us-east-1.amazonaws.com/Brochure/Company+Brochure.pdf"
                       target="_blank"
                       size="lg"
                       colorScheme="purple"
